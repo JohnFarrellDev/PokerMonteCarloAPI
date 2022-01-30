@@ -36,5 +36,16 @@ namespace PokerMonteCarloAPI.Tests
             response?.Value.Should().BeEquivalentTo(expectedResponse);
             response?.StatusCode.Should().Be(200);
         }
+        
+        [Test]
+        public void WhenMonteCarloIsCalledTheMonteServiceIsCalledWithTheSameRequestObject()
+        {
+            var request = _testUtilities.GenerateRequest(allCards);
+            _mockMonte.Setup(x => x.Carlo(request, 10_000));
+
+            var response = _controller.MonteCarlo(request) as ObjectResult;
+
+            _mockMonte.Verify(x => x.Carlo(request, 10_000));
+        }
     }
 }
