@@ -4,7 +4,7 @@ namespace PokerMonteCarloAPI
 {
     public static class Constants
     {
-        public static IDictionary<GameStage, int> MapGameStageToExpectedTableCards =
+        public static readonly IDictionary<GameStage, int> MapGameStageToExpectedTableCards =
             new Dictionary<GameStage, int>
             {
                 { GameStage.PreFlop, 0 },
@@ -13,7 +13,7 @@ namespace PokerMonteCarloAPI
                 { GameStage.River, 5 }
             };
 
-        public static IDictionary<GameStage, string> MapGameStageToDisplayValue = new Dictionary<GameStage, string>
+        public static readonly IDictionary<GameStage, string> MapGameStageToDisplayValue = new Dictionary<GameStage, string>
         {
             { GameStage.PreFlop, "Preflop" },
             { GameStage.Flop, "Flop" },

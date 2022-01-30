@@ -19,7 +19,7 @@ namespace PokerMonteCarloAPI
             this.value = value;
             this.suit = suit;
         }
-
+        
         protected bool Equals(Card other)
         {
             return suit == other.suit && value == other.value;

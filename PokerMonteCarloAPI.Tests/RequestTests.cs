@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Bogus;
 using NUnit.Framework;
 using FluentAssertions;
@@ -9,38 +11,51 @@ namespace PokerMonteCarloAPI.Tests
     [TestFixture]
     public class RequestTests
     {
-        private Faker _faker = new Faker();
+        private readonly Faker _faker = new Faker();
+        private List<Card> allCards = null!;
+        private readonly Random _random = new Random();
         
         [SetUp]
         public void Setup()
         {
-            
+            allCards = Utilities.GenerateAllCards().ToList();
+            Utilities.FisherYatesShuffle(allCards);
         }
-
-        // we want to run test x1000
-        // we need to make a pack of cards and apply them randomly but remove, this is to not have any duplicates
-        // we need to choose a game stage and correctly put number of table cards down
         
         [Test]
+        [Repeat(1000)]
         public void ValidationPassedWithValidProperties()
         {
+            var gameStage = _faker.PickRandom<GameStage>();
+
+            var tableCards = new List<Card>();
+            for(var i = 0; i < Constants.MapGameStageToExpectedTableCards[gameStage]; i++)
+            {
+                tableCards.Add(allCards.Pop());
+            }
+
+            var numberOfPlayers = _random.Next(13) + 2;
+            var players = new List<PlayerRequests>();
+            for (var i = 0; i < numberOfPlayers; i++)
+            {
+                var player = new PlayerRequests
+                {
+                    Cards = new List<Card>()
+                };
+                for (var j = 0; j < _random.Next(3); j++)
+                {
+                    player.Cards.Add(allCards.Pop());
+                }
+                player.Folded = _faker.PickRandomParam(true, false);
+                
+                players.Add(player);
+            }
+            
             var request = new Request()
             {
-                GameStage = GameStage.Flop,
-                TableCards = new List<Card>(),
-                Players = new List<PlayerRequests>
-                {
-                    new PlayerRequests
-                    {
-                        Cards = new List<Card>(),
-                        Folded = true,
-                    },
-                    new PlayerRequests
-                    {
-                        Cards = new List<Card>(),
-                        Folded = true,
-                    }
-                }
+                GameStage = gameStage,
+                TableCards = tableCards,
+                Players = players
             };
 
             var validator = new RequestValidator();
