@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerMonteCarloAPI", "PokerMonteCarloAPI\PokerMonteCarloAPI.csproj", "{43A79DB8-EBE0-44CB-8377-9D2722CDC268}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerMonteCarloAPI.Tests", "PokerMonteCarloAPI.Tests\PokerMonteCarloAPI.Tests.csproj", "{FEE5A8BC-A984-41AF-A803-0FEBE2D23222}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43A79DB8-EBE0-44CB-8377-9D2722CDC268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A79DB8-EBE0-44CB-8377-9D2722CDC268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A79DB8-EBE0-44CB-8377-9D2722CDC268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A79DB8-EBE0-44CB-8377-9D2722CDC268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEE5A8BC-A984-41AF-A803-0FEBE2D23222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEE5A8BC-A984-41AF-A803-0FEBE2D23222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEE5A8BC-A984-41AF-A803-0FEBE2D23222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEE5A8BC-A984-41AF-A803-0FEBE2D23222}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
