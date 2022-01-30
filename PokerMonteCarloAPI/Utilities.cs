@@ -1,11 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
+#nullable enable
 namespace PokerMonteCarloAPI
 {
     public static class Utilities
     {
+        public static List<Card> GenerateTableCards(Request request, List<Card> deckCards)
+        {
+            var allTableCards = new List<Card>(request.TableCards);
+
+            while (allTableCards.Count < 5)
+            {
+                allTableCards.Add(deckCards.Pop());
+            }
+
+            return allTableCards;
+        }
+
+        // public static Player GeneratePlayer()
+        // {
+        //     
+        // }
+        
         public static IEnumerable<Card> GenerateAllCards()
         {
             foreach (var suit in Enum.GetValues(typeof(Suit)))

@@ -17,7 +17,7 @@ namespace PokerMonteCarloAPI.Tests
             }
         }
 
-        public IEnumerable<PlayerRequest> GeneratePlayers(List<Card> allCards, int? numberOfPlayers = null)
+        public IEnumerable<PlayerRequest> GenerateTestPlayers(List<Card> allCards, int? numberOfPlayers = null)
         {
             numberOfPlayers ??= _random.Next(13) + 2;
             

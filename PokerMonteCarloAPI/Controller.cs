@@ -18,7 +18,7 @@ namespace PokerMonteCarloAPI
         [Produces("application/json")]
         public ActionResult<Response> Test([FromBody] Request request)
         {
-            var result = _monte.Carlo(request);
+            var result = _monte.Carlo(request, 10_000);
             return Ok(result);
         }
     }

@@ -26,7 +26,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
-                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+                Players = _testUtilities.GenerateTestPlayers(allCards).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -46,7 +46,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
-                Players = _testUtilities.GeneratePlayers(allCards, numberOfPlayers).ToList()
+                Players = _testUtilities.GenerateTestPlayers(allCards, numberOfPlayers).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -58,7 +58,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenPlayerSubmittedWithMoreThan2Cards()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             players[0].Cards.Add(allCards.Pop());
             players[0].Cards.Add(allCards.Pop());
             players[0].Cards.Add(allCards.Pop());
@@ -78,7 +78,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenAPlayerHasDuplicateCards()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             var sharedCard = allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard, sharedCard, };
 
@@ -97,7 +97,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenDifferentPlayersShareACard()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             var sharedCard = allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard };
             players[1].Cards = new List<Card> { sharedCard };
@@ -117,7 +117,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenAPlayersSharesACardWithTheTable()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             var sharedCard = allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard };
             var tableCards = new List<Card> { sharedCard };
@@ -137,7 +137,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenCardValueIsNotValidForAnyPlayerCards()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             players[0].Cards = new List<Card> { new Card((Value) 15, Suit.Diamonds) };
 
             var request = new Request
@@ -155,7 +155,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenCardSuitIsNotValidForAnyPlayerCards()
         {
-            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            var players = _testUtilities.GenerateTestPlayers(allCards).ToList();
             players[0].Cards = new List<Card> { new Card(Value.Ace, (Suit) 4) };
 
             var request = new Request
@@ -181,7 +181,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = tableCards,
-                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+                Players = _testUtilities.GenerateTestPlayers(allCards).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -196,7 +196,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = new List<Card> { new Card((Value) 15, Suit.Hearts) },
-                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+                Players = _testUtilities.GenerateTestPlayers(allCards).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -211,7 +211,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = new List<Card> { new Card(Value.Ace, (Suit) 4) },
-                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+                Players = _testUtilities.GenerateTestPlayers(allCards).ToList()
             };
 
             var validationResults = _validator.Validate(request);

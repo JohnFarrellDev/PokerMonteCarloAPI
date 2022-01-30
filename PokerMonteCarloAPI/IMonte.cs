@@ -3,6 +3,6 @@ namespace PokerMonteCarloAPI
 {
     public interface IMonte
     {
-        Response Carlo(Request request);
+        Response Carlo(Request request, int numberOfSimulations);
     }
 }
