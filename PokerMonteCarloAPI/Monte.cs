@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 
 #nullable enable
 namespace PokerMonteCarloAPI
 {
     public class Monte : IMonte
     {
-        public Response Carlo(Request request, int numberOfSimulations)
+        public Response Carlo(Request request, int numberOfSimulations = 10_000)
         {
             var allCards = Utilities.GenerateAllCards().ToList();
             var remainingCards = RemovePlayerAndTableCards(allCards, request);
@@ -33,8 +32,7 @@ namespace PokerMonteCarloAPI
             return new Response
             {
                 Id = 1,
-                Test = "hello world",
-                Test2 = JsonSerializer.Serialize(request)
+                Test = "hello world"
             };
         }
 

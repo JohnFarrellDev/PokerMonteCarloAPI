@@ -9,6 +9,24 @@ namespace PokerMonteCarloAPI.Tests
     {
         private readonly Random _random = new Random();
 
+        public Request GenerateRequest(List<Card> allCards, int? numberOfPlayers = null)
+        {
+            return new Request
+            {
+                TableCards = GenerateTableCards(allCards).ToList(),
+                Players = GenerateTestPlayers(allCards, numberOfPlayers).ToList()
+            };
+        }
+
+        public static Response GenerateResponse()
+        {
+            return new Response
+            {
+                Id = 1,
+                Test = "hello world"
+            };
+        }
+        
         public IEnumerable<Card> GenerateTableCards(List<Card> allCards)
         {
             for(var i = 0; i < _random.Next(6); i++)

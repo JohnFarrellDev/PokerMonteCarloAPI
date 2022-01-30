@@ -23,11 +23,7 @@ namespace PokerMonteCarloAPI.Tests
         [Repeat(1000)]
         public void ValidationPassedWithValidProperties()
         {
-            var request = new Request
-            {
-                TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
-                Players = _testUtilities.GenerateTestPlayers(allCards).ToList()
-            };
+            var request = _testUtilities.GenerateRequest(allCards);
             
             var validationResults = _validator.Validate(request);
 
@@ -43,11 +39,7 @@ namespace PokerMonteCarloAPI.Tests
         [TestCaseSource(nameof(invalidPlayerCounts))]
         public void ValidationFailsWhenLessThan2PlayersOrMoreThan14(int numberOfPlayers, string errorMessage)
         {
-            var request = new Request
-            {
-                TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
-                Players = _testUtilities.GenerateTestPlayers(allCards, numberOfPlayers).ToList()
-            };
+            var request = _testUtilities.GenerateRequest(allCards, numberOfPlayers);
             
             var validationResults = _validator.Validate(request);
 
