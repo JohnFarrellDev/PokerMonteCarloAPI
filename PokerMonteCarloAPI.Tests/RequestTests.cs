@@ -16,8 +16,7 @@ namespace PokerMonteCarloAPI.Tests
         [SetUp]
         public void Setup()
         {
-            allCards = Utilities.GenerateAllCards().ToList();
-            Utilities.FisherYatesShuffle(allCards);
+            allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
         }
         
         [Test]

@@ -17,16 +17,18 @@ namespace PokerMonteCarloAPI
             }
         }
 
-        public static void FisherYatesShuffle(List<Card> cardsToShuffle)
+        public static List<T> FisherYatesShuffle<T>(this List<T> listToShuffle)
         {
             var random = new Random();
-            var n = cardsToShuffle.Count;
+            var n = listToShuffle.Count;
 
             while (n > 1)
             {
                 var k = random.Next(n--);
-                (cardsToShuffle[n], cardsToShuffle[k]) = (cardsToShuffle[k], cardsToShuffle[n]);
+                (listToShuffle[n], listToShuffle[k]) = (listToShuffle[k], listToShuffle[n]);
             }
+
+            return listToShuffle;
         }
         
         public static T Pop<T>(this List<T> list)
