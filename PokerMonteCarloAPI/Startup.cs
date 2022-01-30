@@ -17,6 +17,8 @@ namespace PokerMonteCarloAPI
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation(fv =>
                     fv.RegisterValidatorsFromAssemblyContaining<Request>(lifetime: ServiceLifetime.Singleton));
+
+            services.AddScoped<IMonte, Monte>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
