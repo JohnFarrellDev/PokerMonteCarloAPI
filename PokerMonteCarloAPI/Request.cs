@@ -9,10 +9,10 @@ namespace PokerMonteCarloAPI
     public class Request
     {
         [JsonPropertyName("players")] 
-        public List<PlayerRequest> Players { get; set; } = null!;
+        public List<PlayerRequest> Players { get; init; } = null!;
         
         [JsonPropertyName("tableCards")]
-        public List<Card> TableCards { get; set; } = null!;
+        public List<Card> TableCards { get; init; } = null!;
     }
 
     public class PlayerRequest
