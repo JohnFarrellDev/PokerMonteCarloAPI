@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Bogus;
 using NUnit.Framework;
 using FluentAssertions;
 
@@ -10,7 +9,6 @@ namespace PokerMonteCarloAPI.Tests
     [TestFixture]
     public class RequestTests
     {
-        private readonly Faker _faker = new Faker();
         private readonly TestUtilities _testUtilities = new TestUtilities();
         private List<Card> allCards = null!;
         
@@ -25,8 +23,7 @@ namespace PokerMonteCarloAPI.Tests
         [Repeat(1000)]
         public void ValidationPassedWithValidProperties()
         {
-            var gameStage = _faker.PickRandom<GameStage>();
-            var tableCards = TestUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
             var players = _testUtilities.GeneratePlayers(allCards).ToList();
             
             var request = new Request
@@ -50,8 +47,7 @@ namespace PokerMonteCarloAPI.Tests
         [TestCaseSource(nameof(invalidPlayerCounts))]
         public void ValidationFailsWhenLessThan2PlayersOrMoreThan14(int numberOfPlayers, string errorMessage)
         {
-            var gameStage = _faker.PickRandom<GameStage>();
-            var tableCards = TestUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
             var players = _testUtilities.GeneratePlayers(allCards, numberOfPlayers).ToList();
             
             var request = new Request
@@ -70,8 +66,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenPlayerSubmittedWithMoreThan2Cards()
         {
-            var gameStage = _faker.PickRandom<GameStage>();
-            var tableCards = TestUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
             var players = _testUtilities.GeneratePlayers(allCards).ToList();
             players[0].Cards.Add(allCards.Pop());
             players[0].Cards.Add(allCards.Pop());
@@ -93,7 +88,75 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenAPlayerHasDuplicateCards()
         {
-            
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
+            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            players[0].Cards = new List<Card>
+            {
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.King, Suit.Hearts)
+            };
+
+            var request = new Request
+            {
+                TableCards = tableCards,
+                Players = players
+            };
+
+            var validator = new RequestValidator();
+            var validationResults = validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
+        }
+        
+        [Test]
+        public void ValidationFailsWhenADifferentPlayersShareACard()
+        {
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
+            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            players[0].Cards = new List<Card>
+            {
+                new Card(Value.King, Suit.Hearts)
+            };
+            players[1].Cards = new List<Card>
+            {
+                new Card(Value.King, Suit.Hearts)
+            };
+
+            var request = new Request
+            {
+                TableCards = tableCards,
+                Players = players
+            };
+
+            var validator = new RequestValidator();
+            var validationResults = validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
+        }
+        
+        [Test]
+        public void ValidationFailsWhenAPlayersSharesACardWithTheTable()
+        {
+            var tableCards = _testUtilities.GenerateTableCards(allCards).ToList();
+            var players = _testUtilities.GeneratePlayers(allCards).ToList();
+            players[0].Cards = new List<Card>
+            {
+                new Card(Value.King, Suit.Hearts)
+            };
+
+            var request = new Request
+            {
+                TableCards = tableCards,
+                Players = players
+            };
+
+            var validator = new RequestValidator();
+            var validationResults = validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
         }
 
         [Test]

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bogus;
 
 #nullable enable
 namespace PokerMonteCarloAPI.Tests
@@ -9,11 +8,10 @@ namespace PokerMonteCarloAPI.Tests
     public class TestUtilities
     {
         private readonly Random _random = new Random();
-        private readonly Faker _faker = new Faker();
-        
-        public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, GameStage gameStage)
+
+        public IEnumerable<Card> GenerateTableCards(List<Card> allCards)
         {
-            for(var i = 0; i < Constants.MapGameStageToExpectedTableCards[gameStage]; i++)
+            for(var i = 0; i < _random.Next(6); i++)
             {
                 yield return allCards.Pop();
             }
@@ -25,7 +23,7 @@ namespace PokerMonteCarloAPI.Tests
             
             for (var i = 0; i < numberOfPlayers; i++)
             {
-                yield return GeneratePlayerRequest(allCards, _random.Next(3), _faker.PickRandom(true, false));
+                yield return GeneratePlayerRequest(allCards, _random.Next(3), _random.Next(2) == 1);
             }
         }
         
