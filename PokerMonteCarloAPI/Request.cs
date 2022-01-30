@@ -31,6 +31,8 @@ namespace PokerMonteCarloAPI
             RuleFor(r => r.Players.Count)
                 .GreaterThanOrEqualTo(2)
                 .LessThanOrEqualTo(14);
+
+            RuleFor(r => r.TableCards.Count).LessThanOrEqualTo(5);
             
             RuleForEach(r => r.Players)
                 .Must(player => player.Cards.Count <= 2)
@@ -39,6 +41,11 @@ namespace PokerMonteCarloAPI
             RuleFor(r => r.Players).Must((request, _) =>
                 {
                     foreach (var card in request.Players.SelectMany(player => player.Cards))
+                    {
+                        if ((int)card.value < 2 || (int)card.value > 14) return false;
+                        if ((int)card.suit < 0 || (int)card.suit > 3) return false;
+                    }
+                    foreach (var card in request.TableCards)
                     {
                         if ((int)card.value < 2 || (int)card.value > 14) return false;
                         if ((int)card.suit < 0 || (int)card.suit > 3) return false;

@@ -135,7 +135,7 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
-        public void ValidationFailsWhenCardValueIsNotValid()
+        public void ValidationFailsWhenCardValueIsNotValidForAnyPlayerCards()
         {
             var players = _testUtilities.GeneratePlayers(allCards).ToList();
             players[0].Cards = new List<Card> { new Card((Value) 15, Suit.Diamonds) };
@@ -153,7 +153,7 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
-        public void ValidationFailsWhenCardSuitIsNotValid()
+        public void ValidationFailsWhenCardSuitIsNotValidForAnyPlayerCards()
         {
             var players = _testUtilities.GeneratePlayers(allCards).ToList();
             players[0].Cards = new List<Card> { new Card(Value.Ace, (Suit) 4) };
@@ -162,6 +162,56 @@ namespace PokerMonteCarloAPI.Tests
             {
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = players
+            };
+
+            var validationResults = _validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
+        }
+
+        [Test]
+        public void ValidationFailsWhenMoreThan5TableCardsProvided()
+        {
+            var tableCards = new List<Card>
+            {
+                allCards.Pop(), allCards.Pop(), allCards.Pop(), allCards.Pop(), allCards.Pop(), allCards.Pop(),
+            };
+            
+            var request = new Request
+            {
+                TableCards = tableCards,
+                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+            };
+            
+            var validationResults = _validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("'Table Cards Count' must be less than or equal to '5'.");
+        }
+        
+        [Test]
+        public void ValidationFailsWhenCardValueIsNotValidForAnyTableCards()
+        {
+            var request = new Request
+            {
+                TableCards = new List<Card> { new Card((Value) 15, Suit.Hearts) },
+                Players = _testUtilities.GeneratePlayers(allCards).ToList()
+            };
+            
+            var validationResults = _validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
+        }
+
+        [Test]
+        public void ValidationFailsWhenCardSuitIsNotValidForAnyTableCards()
+        {
+            var request = new Request
+            {
+                TableCards = new List<Card> { new Card(Value.Ace, (Suit) 4) },
+                Players = _testUtilities.GeneratePlayers(allCards).ToList()
             };
 
             var validationResults = _validator.Validate(request);
