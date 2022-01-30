@@ -10,6 +10,7 @@ namespace PokerMonteCarloAPI.Tests
     public class RequestTests
     {
         private readonly TestUtilities _testUtilities = new TestUtilities();
+        private readonly RequestValidator _validator = new RequestValidator();
         private List<Card> allCards = null!;
         
         [SetUp]
@@ -28,9 +29,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = _testUtilities.GeneratePlayers(allCards).ToList()
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeTrue();
         }
@@ -49,9 +49,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = _testUtilities.GeneratePlayers(allCards, numberOfPlayers).ToList()
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be(errorMessage);
@@ -70,9 +69,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = players
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("can only provide at most 2 cards for any player");
@@ -90,9 +88,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = players
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
@@ -111,9 +108,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = players
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
@@ -132,9 +128,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = tableCards,
                 Players = players
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
@@ -151,9 +146,8 @@ namespace PokerMonteCarloAPI.Tests
                 TableCards = _testUtilities.GenerateTableCards(allCards).ToList(),
                 Players = players
             };
-
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
@@ -171,8 +165,7 @@ namespace PokerMonteCarloAPI.Tests
                 Players = players
             };
 
-            var validator = new RequestValidator();
-            var validationResults = validator.Validate(request);
+            var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
