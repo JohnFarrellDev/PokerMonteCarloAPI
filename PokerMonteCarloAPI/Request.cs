@@ -12,13 +12,13 @@ namespace PokerMonteCarloAPI
         public GameStage GameStage { get; set; }
         
         [JsonPropertyName("players")] 
-        public List<PlayerRequests> Players { get; set; } = null!;
+        public List<PlayerRequest> Players { get; set; } = null!;
         
         [JsonPropertyName("tableCards")]
         public List<Card> TableCards { get; set; } = null!;
     }
 
-    public class PlayerRequests
+    public class PlayerRequest
     {
         [JsonPropertyName("cards")]
         public List<Card> Cards { get; set; } = null!;

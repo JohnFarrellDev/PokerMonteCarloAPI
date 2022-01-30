@@ -12,8 +12,8 @@ namespace PokerMonteCarloAPI.Tests
     public class RequestTests
     {
         private readonly Faker _faker = new Faker();
+        private readonly TestUtilities _testUtilities = new TestUtilities();
         private List<Card> allCards = null!;
-        private readonly Random _random = new Random();
         
         [SetUp]
         public void Setup()
@@ -27,31 +27,10 @@ namespace PokerMonteCarloAPI.Tests
         public void ValidationPassedWithValidProperties()
         {
             var gameStage = _faker.PickRandom<GameStage>();
-
-            var tableCards = new List<Card>();
-            for(var i = 0; i < Constants.MapGameStageToExpectedTableCards[gameStage]; i++)
-            {
-                tableCards.Add(allCards.Pop());
-            }
-
-            var numberOfPlayers = _random.Next(13) + 2;
-            var players = new List<PlayerRequests>();
-            for (var i = 0; i < numberOfPlayers; i++)
-            {
-                var player = new PlayerRequests
-                {
-                    Cards = new List<Card>()
-                };
-                for (var j = 0; j < _random.Next(3); j++)
-                {
-                    player.Cards.Add(allCards.Pop());
-                }
-                player.Folded = _faker.PickRandomParam(true, false);
-                
-                players.Add(player);
-            }
+            var tableCards = _testUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var players = _testUtilities.GeneratePlayers(allCards).ToList();
             
-            var request = new Request()
+            var request = new Request
             {
                 GameStage = gameStage,
                 TableCards = tableCards,
