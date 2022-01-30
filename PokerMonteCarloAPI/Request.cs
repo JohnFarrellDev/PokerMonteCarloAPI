@@ -8,9 +8,6 @@ namespace PokerMonteCarloAPI
 {
     public class Request
     {
-        [JsonPropertyName("gameStage")] 
-        public GameStage GameStage { get; set; }
-        
         [JsonPropertyName("players")] 
         public List<PlayerRequest> Players { get; set; } = null!;
         
@@ -34,12 +31,6 @@ namespace PokerMonteCarloAPI
             RuleFor(r => r.Players.Count)
                 .GreaterThanOrEqualTo(2)
                 .LessThanOrEqualTo(14);
-
-            RuleFor(r => r.GameStage)
-                .NotNull()
-                .IsInEnum()
-                .WithMessage(r =>
-                    $"Game stage can be 0 (preflop), 1 (flop), 2 (turn) or 3 (river), {r.GameStage} is an invalid value");
             
             RuleForEach(r => r.Players)
                 .Must(player => player.Cards.Count <= 2)
@@ -56,13 +47,7 @@ namespace PokerMonteCarloAPI
                 })
                 .WithMessage(
                     "card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
-
-            RuleFor(r => r.TableCards).Must((request, _) =>
-                    Constants.MapGameStageToExpectedTableCards.ContainsKey(request.GameStage) && 
-                    request.TableCards.Count == Constants.MapGameStageToExpectedTableCards[request.GameStage])
-                .WithMessage(r =>
-                    $"Stage {Constants.MapGameStageToDisplayValue[r.GameStage]} expects {Constants.MapGameStageToExpectedTableCards[r.GameStage]} table cards but received {r.TableCards.Count}");
-
+            
             RuleFor(r => r).Must((request, _) =>
                 {
                     var providedCardCount = request.TableCards.Count +

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bogus;
@@ -27,7 +26,7 @@ namespace PokerMonteCarloAPI.Tests
         public void ValidationPassedWithValidProperties()
         {
             var gameStage = _faker.PickRandom<GameStage>();
-            var tableCards = _testUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var tableCards = TestUtilities.GenerateTableCards(allCards, gameStage).ToList();
             var players = _testUtilities.GeneratePlayers(allCards).ToList();
             
             var request = new Request
@@ -42,7 +41,18 @@ namespace PokerMonteCarloAPI.Tests
 
             validationResults.IsValid.Should().BeTrue();
         }
+
+        [Test]
+        public void ValidationFailsWhenLessThan2Players()
+        {
+            
+        }
         
+        [Test]
+        public void ValidationFailsWhenMoreThan14Players()
+        {
+            
+        }
         // test each property conditions, show fails as expected for every fail possibility
         // test with faker, run text x1000 for fuzzing? should all pass
     }

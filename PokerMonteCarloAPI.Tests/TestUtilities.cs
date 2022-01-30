@@ -11,7 +11,7 @@ namespace PokerMonteCarloAPI.Tests
         private readonly Random _random = new Random();
         private readonly Faker _faker = new Faker();
         
-        public IEnumerable<Card> GenerateTableCards(List<Card> allCards, GameStage gameStage)
+        public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, GameStage gameStage)
         {
             for(var i = 0; i < Constants.MapGameStageToExpectedTableCards[gameStage]; i++)
             {
