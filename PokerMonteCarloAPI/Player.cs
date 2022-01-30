@@ -5,22 +5,13 @@ namespace PokerMonteCarloAPI
 {
     public class Player
     {
-        public List<Card> playersHand = new List<Card>(7);
+        public List<Card> playersHand = null!;
         public bool Folded;
 
-        public Player(Card firstCard, Card secondCard, bool folded) //now will take two Card objects
+        public Player(List<Card> playersHand, bool folded)
         {
-            playersHand.Add(firstCard);
-            playersHand.Add(secondCard);
+            this.playersHand = playersHand;
             Folded = folded;
-        }
-
-        public Player(List<Card> cardsPlayerHas) //create a player object from a list of cards
-        {
-            foreach(var card in cardsPlayerHas)
-            {
-                playersHand.Add(card);
-            }
         }
     }
 }

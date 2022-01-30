@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -12,17 +13,21 @@ namespace PokerMonteCarloAPI
             var allCards = Utilities.GenerateAllCards().ToList();
             var remainingCards = RemovePlayerAndTableCards(allCards, request);
             
-            // generate our players
+            
             
             // calculate each players best hand
+            // first best hand but also 5 highest cards that make the hand
             // determine winner
-            // keep score
+            // keep score for how often each player has won
             // extra - keep track of each players hand over time, return what percentage of time we got certain hands
             
             for (var i = 0; i < numberOfSimulations; i++)
             {
                 var shuffledRemainingCards = remainingCards.ToList().FisherYatesShuffle();
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
+                var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
+
+                Console.WriteLine();
             }
             
             return new Response

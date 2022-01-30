@@ -1,11 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #nullable enable
 namespace PokerMonteCarloAPI
 {
     public static class Utilities
     {
+        public static List<Player> GeneratePlayers(IEnumerable<Card> sharedTableCards, List<Card> deckCards,
+            Request request)
+        {
+            return request
+                .Players
+                .Select(playerRequest => GeneratePlayer(sharedTableCards, deckCards, playerRequest))
+                .ToList();
+        } 
+        private static Player GeneratePlayer(IEnumerable<Card> sharedTableCards, List<Card> deckCards, PlayerRequest playerRequests)
+        {
+            var allPlayerCards = sharedTableCards.Concat(playerRequests.Cards).ToList();
+            while (allPlayerCards.Count < 7)
+            {
+                allPlayerCards.Add(deckCards.Pop());
+            }
+
+            return new Player(allPlayerCards, playerRequests.Folded);
+        }
+        
+        
         public static List<Card> GenerateTableCards(Request request, List<Card> deckCards)
         {
             var allTableCards = new List<Card>(request.TableCards);
