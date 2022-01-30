@@ -31,7 +31,6 @@ namespace PokerMonteCarloAPI.Tests
             
             var request = new Request
             {
-                GameStage = gameStage,
                 TableCards = tableCards,
                 Players = players
             };
@@ -42,14 +41,53 @@ namespace PokerMonteCarloAPI.Tests
             validationResults.IsValid.Should().BeTrue();
         }
 
-        [Test]
-        public void ValidationFailsWhenLessThan2Players()
+        private static object[] invalidPlayerCounts =
         {
+            new object[] {0, "'Players Count' must be greater than or equal to '2'."},
+            new object[] {1, "'Players Count' must be greater than or equal to '2'."},
+            new object[] {15, "'Players Count' must be less than or equal to '14'."},
+        };
+        
+        [TestCaseSource(nameof(invalidPlayerCounts))]
+        public void ValidationFailsWhenLessThan2PlayersOrMoreThan14(int numberOfPlayers, string errorMessage)
+        {
+            var gameStage = _faker.PickRandom<GameStage>();
+            var tableCards = TestUtilities.GenerateTableCards(allCards, gameStage).ToList();
+            var players = _testUtilities.GeneratePlayers(allCards, numberOfPlayers).ToList();
             
+            var request = new Request
+            {
+                TableCards = tableCards,
+                Players = players
+            };
+
+            var validator = new RequestValidator();
+            var validationResults = validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be(errorMessage);
         }
         
         [Test]
-        public void ValidationFailsWhenMoreThan14Players()
+        public void ValidationFailsWhenPlayerSubmittedWithMoreThan2Cards()
+        {
+            
+        }
+
+        [Test]
+        public void ValidationFailsWhenNotAllSubmittedCardsAreUnique()
+        {
+            
+        }
+
+        [Test]
+        public void ValidationFailsWhenCardValueIsNotValid()
+        {
+            
+        }
+
+        [Test]
+        public void ValidationFailsWhenCardSuitIsNotValid()
         {
             
         }
