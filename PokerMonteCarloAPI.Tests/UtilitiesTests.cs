@@ -9,6 +9,8 @@ namespace PokerMonteCarloAPI.Tests
     [TestFixture]
     public class UtilitiesTests
     {
+        private readonly TestUtilities _testUtilities = new TestUtilities();
+        
         [Test]
         public void GenerateAllCardsProduced52DistinctPlayingCards()
         {
@@ -71,10 +73,84 @@ namespace PokerMonteCarloAPI.Tests
             var variance = deviationSquared / countCardShuffledPosition.Count;
             var standardDeviation = Math.Sqrt(variance);
 
-            // standard deviation of 0 means complete randomness
+            // standard deviation of 0 means perfect "randomness"
             // standard deviation of 1500 when fisher-yates not applied
             // standard deviation typically between 130-150 with fisher-yates
             standardDeviation.Should().BeLessThan(200);
+        }
+
+        [Test]
+        public void GenerateAllTableCardsFromRequest()
+        {
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            
+            var request = _testUtilities.GenerateRequest(allCards);
+            while (request.TableCards.Count < 5)
+            {
+                request.TableCards.Add(allCards.Pop());
+            }
+
+            var tableCards = Utilities.GenerateTableCards(request, allCards);
+
+            tableCards.Count.Should().Be(5);
+            for (var i = 0; i < 5; i++)
+            {
+                request.TableCards[i].Should().BeEquivalentTo(tableCards[i]);
+            }
+        }
+
+        [Test]
+        public void GenerateAllTableCardsFromDeck()
+        {
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            request.TableCards = new List<Card>();
+
+            var top5CardsFromDeck = allCards.TakeLast(5).ToList();
+            
+            var tableCards = Utilities.GenerateTableCards(request, allCards);
+            tableCards.Reverse();
+            
+            tableCards.Count.Should().Be(5);
+            for (var i = 0; i < 5; i++)
+            {
+                tableCards[i].Should().BeEquivalentTo(top5CardsFromDeck[i]);
+            }
+        }
+
+        [Test]
+        public void GenerateTableCardsFromRequestAndDeck()
+        {
+            const int numberOfCardsFromRequests = 3;
+            const int numberOfCardsFromDeck = 2;
+            
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            request.TableCards = new List<Card>();
+            
+            while (request.TableCards.Count < numberOfCardsFromRequests)
+            {
+                request.TableCards.Add(allCards.Pop());
+            }
+
+            var cardsFromDeck = allCards.TakeLast(numberOfCardsFromDeck).ToList();
+
+            var tableCards = Utilities.GenerateTableCards(request, allCards);
+            
+            tableCards.Count.Should().Be(5);
+            
+            for (var i = 0; i < numberOfCardsFromRequests; i++)
+            {
+                tableCards[i].Should().BeEquivalentTo(request.TableCards[i]);
+            }
+            
+            tableCards.Reverse();
+            for (var i = 0; i < numberOfCardsFromDeck; i++)
+            {
+                tableCards[i].Should().BeEquivalentTo(cardsFromDeck[i]);
+            }
+
+            
         }
     }
 }

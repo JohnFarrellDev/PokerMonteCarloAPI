@@ -27,7 +27,6 @@ namespace PokerMonteCarloAPI
             return new Player(allPlayerCards, playerRequests.Folded);
         }
         
-        
         public static List<Card> GenerateTableCards(Request request, List<Card> deckCards)
         {
             var allTableCards = new List<Card>(request.TableCards);
