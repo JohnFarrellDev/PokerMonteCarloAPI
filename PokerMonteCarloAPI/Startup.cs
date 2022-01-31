@@ -33,7 +33,6 @@ namespace PokerMonteCarloAPI
             });
         }
         
-        // TODO - test generate player and generate players
         // TODO - implement actual monte carlo solution
         // TODO - utilise stack for removal of last element
         // TODO - consider threads when running monte carlo loop

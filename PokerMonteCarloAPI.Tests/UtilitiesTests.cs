@@ -253,5 +253,39 @@ namespace PokerMonteCarloAPI.Tests
                 generatedPlayer.playersHand.Contains(deckCardToBeAdded).Should().BeTrue();
             }
         }
+
+        [Test]
+        public void TestGeneratePlayersTakeARequestAndOutputsAListOfValidPlayers()
+        {
+            // arrange
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
+
+            // act
+            var generatedPlayers = Utilities.GeneratePlayers(sharedTableCards, allCards, request);
+
+            // assert
+            generatedPlayers.Count.Should().Be(request.Players.Count);
+            
+            for (var i = 0; i < generatedPlayers.Count; i++)
+            {
+                var player = generatedPlayers[i];
+                var playerRequest = request.Players[i];
+                
+                foreach (var playerRequestCard in playerRequest.Cards)
+                {
+                    player.playersHand.Contains(playerRequestCard).Should().BeTrue();
+                }
+            }
+            
+            foreach (var generatedPlayer in generatedPlayers)
+            {
+                foreach (var sharedTableCard in sharedTableCards)
+                {
+                    generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+                }
+            }
+        }
     }
 }
