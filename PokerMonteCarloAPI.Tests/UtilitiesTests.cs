@@ -82,6 +82,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void GenerateAllTableCardsFromRequest()
         {
+            // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
             
             var request = _testUtilities.GenerateRequest(allCards);
@@ -90,37 +91,41 @@ namespace PokerMonteCarloAPI.Tests
                 request.TableCards.Add(allCards.Pop());
             }
 
+            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
 
+            // assert
             tableCards.Count.Should().Be(5);
             for (var i = 0; i < 5; i++)
             {
-                request.TableCards[i].Should().BeEquivalentTo(tableCards[i]);
+                tableCards[i].Should().BeEquivalentTo(request.TableCards[i]);
             }
         }
 
         [Test]
         public void GenerateAllTableCardsFromDeck()
         {
+            // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
             var request = _testUtilities.GenerateRequest(allCards);
             request.TableCards = new List<Card>();
-
             var top5CardsFromDeck = allCards.TakeLast(5).ToList();
             
+            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
-            tableCards.Reverse();
-            
+
+            // assert
             tableCards.Count.Should().Be(5);
             for (var i = 0; i < 5; i++)
             {
-                tableCards[i].Should().BeEquivalentTo(top5CardsFromDeck[i]);
+                tableCards[i].Should().BeEquivalentTo(top5CardsFromDeck[tableCards.Count - 1 - i]);
             }
         }
 
         [Test]
         public void GenerateTableCardsFromRequestAndDeck()
         {
+            // arrange
             const int numberOfCardsFromRequests = 3;
             const int numberOfCardsFromDeck = 2;
             
@@ -134,9 +139,11 @@ namespace PokerMonteCarloAPI.Tests
             }
 
             var cardsFromDeck = allCards.TakeLast(numberOfCardsFromDeck).ToList();
-
+            
+            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
             
+            // assert
             tableCards.Count.Should().Be(5);
             
             for (var i = 0; i < numberOfCardsFromRequests; i++)
