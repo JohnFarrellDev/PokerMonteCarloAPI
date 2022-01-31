@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 #nullable enable
 namespace PokerMonteCarloAPI
@@ -38,11 +39,6 @@ namespace PokerMonteCarloAPI
 
             return allTableCards;
         }
-
-        // public static Player GeneratePlayer()
-        // {
-        //     
-        // }
         
         public static IEnumerable<Card> GenerateAllCards()
         {
@@ -57,12 +53,11 @@ namespace PokerMonteCarloAPI
 
         public static List<T> FisherYatesShuffle<T>(this List<T> listToShuffle)
         {
-            var random = new Random();
             var n = listToShuffle.Count;
 
             while (n > 1)
             {
-                var k = random.Next(n--);
+                var k = RandomNumberGenerator.GetInt32(0, n--);
                 (listToShuffle[n], listToShuffle[k]) = (listToShuffle[k], listToShuffle[n]);
             }
 

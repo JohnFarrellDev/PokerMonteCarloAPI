@@ -43,7 +43,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = _testUtilities.GenerateRequest(allCards);
             _mockMonte.Setup(x => x.Carlo(request, 10_000));
 
-            var response = _controller.MonteCarlo(request) as ObjectResult;
+            _controller.MonteCarlo(request);
 
             _mockMonte.Verify(x => x.Carlo(request, 10_000));
         }
