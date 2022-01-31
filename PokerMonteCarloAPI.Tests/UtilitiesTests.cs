@@ -36,6 +36,17 @@ namespace PokerMonteCarloAPI.Tests
             allCardsSet.Count(card => card.value == Value.King).Should().Be(4);
             allCardsSet.Count(card => card.value == Value.Ace).Should().Be(4);
         }
+
+        [Test]
+        public void CallingPopReturnsTheLastElementFromAListAndAlsoRemovesTheElementFromTheList()
+        {
+            var elements = new List<int> { 1, 2, 3, 4, 5 };
+            var poppedElement = elements.Pop();
+
+            poppedElement.Should().Be(5);
+            elements.Count.Should().Be(4);
+            elements.Contains(5).Should().BeFalse();
+        }
         
         // test fisher yates shuffle algorithm
     }
