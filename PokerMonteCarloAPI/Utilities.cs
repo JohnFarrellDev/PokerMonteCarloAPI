@@ -16,7 +16,7 @@ namespace PokerMonteCarloAPI
                 .Select(playerRequest => GeneratePlayer(sharedTableCards, deckCards, playerRequest))
                 .ToList();
         } 
-        private static Player GeneratePlayer(IEnumerable<Card> sharedTableCards, List<Card> deckCards, PlayerRequest playerRequests)
+        public static Player GeneratePlayer(IEnumerable<Card> sharedTableCards, List<Card> deckCards, PlayerRequest playerRequests)
         {
             var allPlayerCards = sharedTableCards.Concat(playerRequests.Cards).ToList();
             while (allPlayerCards.Count < 7)

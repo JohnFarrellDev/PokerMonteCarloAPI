@@ -155,11 +155,103 @@ namespace PokerMonteCarloAPI.Tests
             {
                 tableCards[i].Should().BeEquivalentTo(cardsFromDeck[i]);
             }
+        }
 
-            // TODO - test generate player and generate players
-            // TODO - implement actual monte carlo solution
-            // TODO - utilise stack for removal of last element
-            // TODO - consider threads when running monte carlo loop
+        [Test]
+        public void TestGeneratePlayerWithFullHandAndTableCards()
+        {
+            // arrange
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
+
+            var playerRequest = request.Players[0];
+            while (playerRequest.Cards.Count < 2)
+            {
+                playerRequest.Cards.Add(allCards.Pop());
+            }
+            
+            var preGeneratingPlayerAllCardsCount = allCards.Count;
+
+            // act
+            var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, playerRequest);
+            
+            // assert
+            generatedPlayer.playersHand.Count.Should().Be(7);
+            allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount);
+            
+            foreach (var sharedTableCard in sharedTableCards)
+            {
+                generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+            }
+            foreach (var playerRequestCard in playerRequest.Cards)
+            {
+                generatedPlayer.playersHand.Contains(playerRequestCard).Should().BeTrue();
+            }
+        }
+
+        [Test]
+        public void TestGeneratePlayerWithNoTableCards()
+        {
+            // arrange
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            request.TableCards = new List<Card>();
+            var deckCardsToBeAdded = allCards.TakeLast(5);
+
+            var playerRequest = request.Players[0];
+            while (playerRequest.Cards.Count < 2)
+            {
+                playerRequest.Cards.Add(allCards.Pop());
+            }
+            
+            var preGeneratingPlayerAllCardsCount = allCards.Count;
+
+            // act
+            var generatedPlayer = Utilities.GeneratePlayer(new List<Card>(), allCards, playerRequest);
+            
+            // assert
+            generatedPlayer.playersHand.Count.Should().Be(7);
+            allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 5);
+            
+            foreach (var playerRequestCard in playerRequest.Cards)
+            {
+                generatedPlayer.playersHand.Contains(playerRequestCard).Should().BeTrue();
+            }
+            foreach (var deckCardToBeAdded in deckCardsToBeAdded)
+            {
+                generatedPlayer.playersHand.Contains(deckCardToBeAdded).Should().BeTrue();
+            }
+        }
+        
+        [Test]
+        public void TestGeneratePlayerWithNoProvidedPlayerCards()
+        {
+            // arrange
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var request = _testUtilities.GenerateRequest(allCards);
+            request.Players[0].Cards = new List<Card>();
+            var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
+            
+            var cardsToBeAppliedToPlayer = allCards.TakeLast(2);
+            
+            var preGeneratingPlayerAllCardsCount = allCards.Count;
+
+            // act
+            var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, request.Players[0]);
+            
+            // assert
+            generatedPlayer.playersHand.Count.Should().Be(7);
+            allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 2);
+            
+            foreach (var sharedTableCard in sharedTableCards)
+            {
+                generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+            }
+            foreach (var deckCardToBeAdded in cardsToBeAppliedToPlayer)
+            {
+                generatedPlayer.playersHand.Contains(deckCardToBeAdded).Should().BeTrue();
+            }
         }
     }
 }
