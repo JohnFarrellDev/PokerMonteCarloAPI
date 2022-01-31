@@ -52,12 +52,11 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
-        [Repeat(10)]
         public void FisherYatesShouldRandomlyShuffleOurListOf52PlayingCards()
         {
             var countCardShuffledPosition = new Dictionary<Card, int>();
             
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 10_000; i++)
             {
                 var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
                 for (var j = 0; j < allCards.Count; j++)
@@ -74,9 +73,9 @@ namespace PokerMonteCarloAPI.Tests
             var standardDeviation = Math.Sqrt(variance);
 
             // standard deviation of 0 means perfect "randomness"
-            // standard deviation of 1500 when fisher-yates not applied
-            // standard deviation typically between 130-150 with fisher-yates
-            standardDeviation.Should().BeLessThan(200);
+            // standard deviation of 150,000 when fisher-yates not applied
+            // standard deviation typically between 1,300-1,600 with fisher-yates
+            standardDeviation.Should().BeLessThan(2_000);
         }
 
         [Test]
