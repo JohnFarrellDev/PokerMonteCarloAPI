@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -47,7 +48,33 @@ namespace PokerMonteCarloAPI.Tests
             elements.Count.Should().Be(4);
             elements.Contains(5).Should().BeFalse();
         }
-        
-        // test fisher yates shuffle algorithm
+
+        [Test]
+        [Repeat(10)]
+        public void FisherYatesShouldRandomlyShuffleOurListOf52PlayingCards()
+        {
+            var countCardShuffledPosition = new Dictionary<Card, int>();
+            
+            for (var i = 0; i < 100; i++)
+            {
+                var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+                for (var j = 0; j < allCards.Count; j++)
+                {
+                    var card = allCards[j];
+                    countCardShuffledPosition[card] =
+                        countCardShuffledPosition.TryGetValue(card, out var value) ? value + j : j;
+                }
+            }
+
+            var average = countCardShuffledPosition.Sum(x => x.Value)/countCardShuffledPosition.Count;
+            var deviationSquared = countCardShuffledPosition.Sum(x => Math.Pow(x.Value - average, 2));
+            var variance = deviationSquared / countCardShuffledPosition.Count;
+            var standardDeviation = Math.Sqrt(variance);
+
+            // standard deviation of 0 means complete randomness
+            // standard deviation of 1500 when fisher-yates not applied
+            // standard deviation typically between 130-150 with fisher-yates
+            standardDeviation.Should().BeLessThan(200);
+        }
     }
 }
