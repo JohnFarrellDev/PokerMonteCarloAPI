@@ -52,12 +52,40 @@ namespace PokerMonteCarloAPI.Tests
             elements.Contains(5).Should().BeFalse();
         }
 
+        private static object[] seededFisherYatesShuffle =
+        {
+            new object[] {1, new List<int> {4,3,5,1,2}},
+            new object[] {11, new List<int> {4,5,2,1,3}},
+            new object[] {111, new List<int> {3,1,5,2,4}},
+            new object[] {1111, new List<int> {5,3,2,4,1}},
+            new object[] {11111, new List<int> {5,3,1,4,2}},
+            new object[] {2, new List<int> {3,5,1,2,4}},
+            new object[] {22, new List<int> {4,3,1,5,2}},
+            new object[] {222, new List<int> {1,2,3,5,4}},
+            new object[] {2222, new List<int> {1,2,5,4,3}},
+            new object[] {22222, new List<int> {4,2,3,5,1}},
+            new object[] {222222, new List<int> {2,3,5,4,1}},
+            new object[] {3, new List<int> {5,1,4,3,2}},
+            new object[] {33, new List<int> {1,2,4,3,5}},
+            new object[] {333, new List<int> {1,5,2,3,4}},
+            new object[] {3333, new List<int> {1,3,2,4,5}},
+            new object[] {33333, new List<int> {5,3,1,2,4}},
+            new object[] {333333, new List<int> {3,1,5,4,2}}
+        };
+        [TestCaseSource(nameof(seededFisherYatesShuffle))]
+        public void FisherYatesWhenRandomSeededProducesSameOutput(int seed, List<int> expectedOutput)
+        {
+            var shuffledNumbers1To5 = Enumerable.Range(1, 5).ToList().FisherYatesShuffle(seed);
+
+            shuffledNumbers1To5.Should().ContainInOrder(expectedOutput);
+        }
+        
         [Test]
         public void FisherYatesShouldRandomlyShuffleAList()
         {
             // arrange
-            const int upperIterationBound = 1_000;
-            const int upperBoundOfRangeOfNumbers = 1_000;
+            const int upperIterationBound = 5_000;
+            const int upperBoundOfRangeOfNumbers = 5_000;
             var countNumbersRandomPositionScores = new int[upperBoundOfRangeOfNumbers].ToList();
             
             for (var i = 0; i < upperIterationBound; i++)
@@ -115,6 +143,10 @@ namespace PokerMonteCarloAPI.Tests
             plt.XAxis.Label($"Cumulative sum from {upperIterationBound} iterations of an array of discrete values 1-{upperBoundOfRangeOfNumbers} being shuffled with fisher-yates");
             plt.SetAxisLimits(yMin: 0);
             
+            plt.Style(Style.Gray1);
+            var bnColor = System.Drawing.ColorTranslator.FromHtml("#2e3440");
+            plt.Style(bnColor, bnColor);
+            
             plt.SaveFig("bar_positions.png");
         }
 
@@ -135,10 +167,7 @@ namespace PokerMonteCarloAPI.Tests
 
             // assert
             tableCards.Count.Should().Be(5);
-            for (var i = 0; i < 5; i++)
-            {
-                tableCards[i].Should().BeEquivalentTo(request.TableCards[i]);
-            }
+            tableCards.Should().ContainInOrder(request.TableCards);
         }
 
         [Test]
@@ -149,16 +178,14 @@ namespace PokerMonteCarloAPI.Tests
             var request = TestUtilities.GenerateRequest(allCards, Random);
             request.TableCards = new List<Card>();
             var top5CardsFromDeck = allCards.TakeLast(5).ToList();
+            top5CardsFromDeck.Reverse();
             
             // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
 
             // assert
             tableCards.Count.Should().Be(5);
-            for (var i = 0; i < 5; i++)
-            {
-                tableCards[i].Should().BeEquivalentTo(top5CardsFromDeck[tableCards.Count - 1 - i]);
-            }
+            tableCards.Should().ContainInOrder(top5CardsFromDeck);
         }
 
         [Test]
@@ -178,23 +205,14 @@ namespace PokerMonteCarloAPI.Tests
             }
 
             var cardsFromDeck = allCards.TakeLast(numberOfCardsFromDeck).ToList();
+            cardsFromDeck.Reverse();
             
             // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
             
             // assert
             tableCards.Count.Should().Be(5);
-            
-            for (var i = 0; i < numberOfCardsFromRequests; i++)
-            {
-                tableCards[i].Should().BeEquivalentTo(request.TableCards[i]);
-            }
-            
-            tableCards.Reverse();
-            for (var i = 0; i < numberOfCardsFromDeck; i++)
-            {
-                tableCards[i].Should().BeEquivalentTo(cardsFromDeck[i]);
-            }
+            tableCards.Should().ContainInOrder(request.TableCards.Concat(cardsFromDeck));
         }
 
         [Test]
