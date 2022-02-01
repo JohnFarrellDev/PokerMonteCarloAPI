@@ -52,30 +52,36 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
-        public void FisherYatesShouldRandomlyShuffleOurListOf52PlayingCards()
+        public void FisherYatesShouldRandomlyShuffleAList()
         {
-            var countCardShuffledPosition = new Dictionary<Card, int>();
+            const int upperIterationBound = 100;
+            const int upperBoundOfRangeOfNumbers = 10_000;
+            var countNumbersRandomPositionScores = new Dictionary<int, long>();
             
-            for (var i = 0; i < 10_000; i++)
+            for (var i = 0; i < upperIterationBound; i++)
             {
-                var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-                for (var j = 0; j < allCards.Count; j++)
+                var numbers1To10_000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
+                for (var j = 0; j < numbers1To10_000.Count; j++)
                 {
-                    var card = allCards[j];
-                    countCardShuffledPosition[card] =
-                        countCardShuffledPosition.TryGetValue(card, out var value) ? value + j : j;
+                    var number = numbers1To10_000[j];
+                    countNumbersRandomPositionScores[number] =
+                        countNumbersRandomPositionScores.TryGetValue(number, out var value) ? value + j : j;
                 }
             }
-
-            var average = countCardShuffledPosition.Sum(x => x.Value)/countCardShuffledPosition.Count;
-            var deviationSquared = countCardShuffledPosition.Sum(x => Math.Pow(x.Value - average, 2));
-            var variance = deviationSquared / countCardShuffledPosition.Count;
+            
+            const long average = ((long)upperBoundOfRangeOfNumbers/2) * (upperIterationBound) - ((upperBoundOfRangeOfNumbers/ upperIterationBound) / 2);
+            var deviationSquared = countNumbersRandomPositionScores.Sum(x => Math.Pow(x.Value - average, 2));
+            var variance = deviationSquared / countNumbersRandomPositionScores.Count;
             var standardDeviation = Math.Sqrt(variance);
 
-            // standard deviation of 0 means perfect "randomness"
-            // standard deviation of 150,000 when fisher-yates not applied
-            // standard deviation typically between 1,300-1,600 with fisher-yates
-            standardDeviation.Should().BeLessThan(2_000);
+            var numberOfValuesWithin1StdDeviation = countNumbersRandomPositionScores.Count(x => x.Value > average - standardDeviation && x.Value < average + standardDeviation);
+            var percentageOfValuesWithin1SigDifference =
+                ((double)numberOfValuesWithin1StdDeviation / upperBoundOfRangeOfNumbers) * 100;
+            
+            
+            // With a normally distributed set of numbers you expect to see 68% within one standard deviation of the mean
+            // Random placement of elements within our element should result in our countNumbersRandomPositionScores values showing normal distribution
+            Assert.That(percentageOfValuesWithin1SigDifference, Is.EqualTo(68).Within(1));
         }
 
         [Test]
@@ -177,16 +183,16 @@ namespace PokerMonteCarloAPI.Tests
             var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, playerRequest);
             
             // assert
-            generatedPlayer.playersHand.Count.Should().Be(7);
+            generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount);
             
             foreach (var sharedTableCard in sharedTableCards)
             {
-                generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(sharedTableCard).Should().BeTrue();
             }
             foreach (var playerRequestCard in playerRequest.Cards)
             {
-                generatedPlayer.playersHand.Contains(playerRequestCard).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(playerRequestCard).Should().BeTrue();
             }
         }
 
@@ -211,16 +217,16 @@ namespace PokerMonteCarloAPI.Tests
             var generatedPlayer = Utilities.GeneratePlayer(new List<Card>(), allCards, playerRequest);
             
             // assert
-            generatedPlayer.playersHand.Count.Should().Be(7);
+            generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 5);
             
             foreach (var playerRequestCard in playerRequest.Cards)
             {
-                generatedPlayer.playersHand.Contains(playerRequestCard).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(playerRequestCard).Should().BeTrue();
             }
             foreach (var deckCardToBeAdded in deckCardsToBeAdded)
             {
-                generatedPlayer.playersHand.Contains(deckCardToBeAdded).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(deckCardToBeAdded).Should().BeTrue();
             }
         }
         
@@ -241,16 +247,16 @@ namespace PokerMonteCarloAPI.Tests
             var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, request.Players[0]);
             
             // assert
-            generatedPlayer.playersHand.Count.Should().Be(7);
+            generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 2);
             
             foreach (var sharedTableCard in sharedTableCards)
             {
-                generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(sharedTableCard).Should().BeTrue();
             }
             foreach (var deckCardToBeAdded in cardsToBeAppliedToPlayer)
             {
-                generatedPlayer.playersHand.Contains(deckCardToBeAdded).Should().BeTrue();
+                generatedPlayer.PlayersHand.Contains(deckCardToBeAdded).Should().BeTrue();
             }
         }
 
@@ -275,7 +281,7 @@ namespace PokerMonteCarloAPI.Tests
                 
                 foreach (var playerRequestCard in playerRequest.Cards)
                 {
-                    player.playersHand.Contains(playerRequestCard).Should().BeTrue();
+                    player.PlayersHand.Contains(playerRequestCard).Should().BeTrue();
                 }
             }
             
@@ -283,7 +289,7 @@ namespace PokerMonteCarloAPI.Tests
             {
                 foreach (var sharedTableCard in sharedTableCards)
                 {
-                    generatedPlayer.playersHand.Contains(sharedTableCard).Should().BeTrue();
+                    generatedPlayer.PlayersHand.Contains(sharedTableCard).Should().BeTrue();
                 }
             }
         }

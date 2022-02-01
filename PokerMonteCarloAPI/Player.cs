@@ -5,12 +5,12 @@ namespace PokerMonteCarloAPI
 {
     public class Player
     {
-        public List<Card> playersHand = null!;
+        public readonly List<Card> PlayersHand;
         public bool Folded;
 
         public Player(List<Card> playersHand, bool folded)
         {
-            this.playersHand = playersHand;
+            PlayersHand = playersHand;
             Folded = folded;
         }
     }

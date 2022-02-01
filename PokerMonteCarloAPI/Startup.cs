@@ -34,6 +34,9 @@ namespace PokerMonteCarloAPI
         }
         
         // TODO - implement actual monte carlo solution
+        //      TODO - Create empty method on Player class to calculate best hand
+        //      TODO - Write tests for all possible hand types + high card combinations
+        //      TODO - Start implementing logic to make tests pass
         // TODO - utilise stack for removal of last element
         // TODO - consider threads when running monte carlo loop
     }
