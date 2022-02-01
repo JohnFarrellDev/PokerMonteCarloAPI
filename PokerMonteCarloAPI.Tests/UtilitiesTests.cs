@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using ScottPlot;
 
 namespace PokerMonteCarloAPI.Tests
 {
@@ -52,13 +53,12 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
-        [Repeat(100)]
         public void FisherYatesShouldRandomlyShuffleAList()
         {
             // arrange
             const int upperIterationBound = 1_000;
             const int upperBoundOfRangeOfNumbers = 1_000;
-            var countNumbersRandomPositionScores = new int[1000].ToList();
+            var countNumbersRandomPositionScores = new int[upperBoundOfRangeOfNumbers].ToList();
             
             for (var i = 0; i < upperIterationBound; i++)
             {
@@ -87,6 +87,35 @@ namespace PokerMonteCarloAPI.Tests
             Assert.That(percentageOfValuesWithin1StdDeviation, Is.EqualTo(68.27).Within(3));
             Assert.That(percentageOfValuesWithin2StdDeviation, Is.EqualTo(95.45).Within(1.5));
             Assert.That(percentageOfValuesWithin3StdDeviation, Is.EqualTo(99.7).Within(0.5));
+            
+            // generate plot to see normal distribution
+            const int bin_width = 2_000;
+            
+            var binLowerBounds = new List<double>();
+            for (var i = average - average * 0.05; i < average + average * 0.05; i += bin_width)
+            {
+                binLowerBounds.Add(i);
+            }
+            
+            var binCounts = new List<double>();
+            for (var i = average - average * 0.05; i < average + average * 0.05; i += bin_width)
+            {
+                binCounts.Add(countNumbersRandomPositionScores.Count(x => x >= i && x < i + bin_width));
+            }
+            
+            var plt = new Plot(1200, 800);
+            
+            var bar = plt.AddBar(binCounts.ToArray(), binLowerBounds.ToArray());
+
+            // customize the width of bars (80% of the inter-position distance looks good)
+            bar.BarWidth = (binLowerBounds[1] - binLowerBounds[0]);
+
+            // adjust axis limits so there is no padding below the bar graph
+            plt.YAxis.Label("Frequency");
+            plt.XAxis.Label($"Cumulative sum from {upperIterationBound} iterations of an array of discrete values 1-{upperBoundOfRangeOfNumbers} being shuffled with fisher-yates");
+            plt.SetAxisLimits(yMin: 0);
+            
+            plt.SaveFig("bar_positions.png");
         }
 
         [Test]
