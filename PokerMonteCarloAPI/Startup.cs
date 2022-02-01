@@ -33,6 +33,10 @@ namespace PokerMonteCarloAPI
             });
         }
         
+        // TODO - generate a normal distribution graph from for our fisher yates test
+        // TODO can the API endpoint accept a QUERY instead of POST
+        // TODO Implementation of an API level test
+        // TODO API healthcheck endpoint
         // TODO - implement actual monte carlo solution
         //      TODO - Create empty method on Player class to calculate best hand
         //      TODO - Write tests for all possible hand types + high card combinations

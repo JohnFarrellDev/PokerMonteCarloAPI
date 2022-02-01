@@ -52,41 +52,41 @@ namespace PokerMonteCarloAPI.Tests
         }
 
         [Test]
+        [Repeat(100)]
         public void FisherYatesShouldRandomlyShuffleAList()
         {
             // arrange
-            const int upperIterationBound = 100;
-            const int upperBoundOfRangeOfNumbers = 10_000;
-            var countNumbersRandomPositionScores = new Dictionary<int, long>();
+            const int upperIterationBound = 1_000;
+            const int upperBoundOfRangeOfNumbers = 1_000;
+            var countNumbersRandomPositionScores = new int[1000].ToList();
             
             for (var i = 0; i < upperIterationBound; i++)
             {
                 // act
-                var numbers1To10_000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
+                var numbers1To1_000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
                 
                 for (var j = 0; j < upperBoundOfRangeOfNumbers; j++)
                 {
-                    var number = numbers1To10_000[j];
-                    countNumbersRandomPositionScores[number] =
-                        countNumbersRandomPositionScores.TryGetValue(number, out var value) ? value + j : j;
+                    countNumbersRandomPositionScores[j] += numbers1To1_000[j];
                 }
             }
             
             // maths bit
             const long average = ((long)upperBoundOfRangeOfNumbers/2) * (upperIterationBound) - ((upperBoundOfRangeOfNumbers/ upperIterationBound) / 2);
-            var deviationSquared = countNumbersRandomPositionScores.Sum(x => Math.Pow(x.Value - average, 2));
+            var deviationSquared = countNumbersRandomPositionScores.Sum(x => Math.Pow(x - average, 2));
             var variance = deviationSquared / countNumbersRandomPositionScores.Count;
             var standardDeviation = Math.Sqrt(variance);
 
-            var numberOfValuesWithin1StdDeviation = countNumbersRandomPositionScores.Count(x => x.Value > average - standardDeviation && x.Value < average + standardDeviation);
-            var percentageOfValuesWithin1SigDifference =
-                ((double)numberOfValuesWithin1StdDeviation / upperBoundOfRangeOfNumbers) * 100;
-            
-            
+            var percentageOfValuesWithin1StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation && x < average + standardDeviation)) / upperBoundOfRangeOfNumbers * 100;
+            var percentageOfValuesWithin2StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation * 2 && x < average + standardDeviation * 2)) / upperBoundOfRangeOfNumbers * 100;
+            var percentageOfValuesWithin3StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation * 3 && x < average + standardDeviation * 3)) / upperBoundOfRangeOfNumbers * 100;
+
             // assert
             // With a normally distributed set of numbers you expect to see 68% within one standard deviation of the mean
             // Random placement of elements within our element should result in our countNumbersRandomPositionScores values showing normal distribution
-            Assert.That(percentageOfValuesWithin1SigDifference, Is.EqualTo(68).Within(1));
+            Assert.That(percentageOfValuesWithin1StdDeviation, Is.EqualTo(68.27).Within(3));
+            Assert.That(percentageOfValuesWithin2StdDeviation, Is.EqualTo(95.45).Within(1.5));
+            Assert.That(percentageOfValuesWithin3StdDeviation, Is.EqualTo(99.7).Within(0.5));
         }
 
         [Test]
