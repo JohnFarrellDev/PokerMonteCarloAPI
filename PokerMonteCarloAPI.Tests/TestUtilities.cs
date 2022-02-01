@@ -5,16 +5,14 @@ using System.Linq;
 #nullable enable
 namespace PokerMonteCarloAPI.Tests
 {
-    public class TestUtilities
+    public static class TestUtilities
     {
-        private readonly Random _random = new Random();
-
-        public Request GenerateRequest(List<Card> allCards, int? numberOfPlayers = null)
+        public static Request GenerateRequest(List<Card> allCards, Random random, int? numberOfPlayers = null)
         {
             return new Request
             {
-                TableCards = GenerateTableCards(allCards).ToList(),
-                Players = GenerateTestPlayers(allCards, numberOfPlayers).ToList()
+                TableCards = GenerateTableCards(allCards, random).ToList(),
+                Players = GenerateTestPlayers(allCards, random, numberOfPlayers).ToList()
             };
         }
 
@@ -27,21 +25,21 @@ namespace PokerMonteCarloAPI.Tests
             };
         }
         
-        public IEnumerable<Card> GenerateTableCards(List<Card> allCards)
+        public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, Random random)
         {
-            for(var i = 0; i < _random.Next(6); i++)
+            for(var i = 0; i < random.Next(6); i++)
             {
                 yield return allCards.Pop();
             }
         }
 
-        public IEnumerable<PlayerRequest> GenerateTestPlayers(List<Card> allCards, int? numberOfPlayers = null)
+        public static IEnumerable<PlayerRequest> GenerateTestPlayers(List<Card> allCards, Random random, int? numberOfPlayers = null)
         {
-            numberOfPlayers ??= _random.Next(13) + 2;
+            numberOfPlayers ??= random.Next(13) + 2;
             
             for (var i = 0; i < numberOfPlayers; i++)
             {
-                yield return GeneratePlayerRequest(allCards, _random.Next(3), _random.Next(2) == 1);
+                yield return GeneratePlayerRequest(allCards, random.Next(3), random.Next(2) == 1);
             }
         }
         

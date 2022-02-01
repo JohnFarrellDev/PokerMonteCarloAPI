@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -11,10 +12,10 @@ namespace PokerMonteCarloAPI.Tests
     [TestFixture]
     public class ControllerTests
     {
-        private readonly TestUtilities _testUtilities = new TestUtilities();
         private Controller _controller = null!;
         private Mock<IMonte> _mockMonte = null!;
         private List<Card> allCards = null!;
+        private readonly Random Random = new Random();
         
         [SetUp]
         public void Setup()
@@ -27,7 +28,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void WhenMonteReturnsAResponseTheControllerReturnsTheResponseObjectWithA200()
         {
-            var request = _testUtilities.GenerateRequest(allCards);
+            var request = TestUtilities.GenerateRequest(allCards, Random);
             var expectedResponse = TestUtilities.GenerateResponse();
             _mockMonte.Setup(x => x.Carlo(request, 10_000)).Returns(expectedResponse);
 
@@ -40,7 +41,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void WhenMonteCarloIsCalledTheMonteServiceIsCalledWithTheSameRequestObject()
         {
-            var request = _testUtilities.GenerateRequest(allCards);
+            var request = TestUtilities.GenerateRequest(allCards, Random);
             _mockMonte.Setup(x => x.Carlo(request, 10_000));
 
             _controller.MonteCarlo(request);
