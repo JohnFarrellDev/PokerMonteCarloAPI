@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 #nullable enable
@@ -25,8 +26,6 @@ namespace PokerMonteCarloAPI
                 var shuffledRemainingCards = remainingCards.ToList().FisherYatesShuffle();
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                 var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
-
-                Console.WriteLine();
             }
             
             return new Response
