@@ -7,7 +7,7 @@ namespace PokerMonteCarloAPI
     {
         public readonly List<Card> PlayersHand;
         public bool Folded;
-
+        
         public Player(List<Card> playersHand, bool folded)
         {
             PlayersHand = playersHand;

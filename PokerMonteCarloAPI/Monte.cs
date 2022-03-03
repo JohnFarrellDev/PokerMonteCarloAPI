@@ -26,6 +26,9 @@ namespace PokerMonteCarloAPI
                 var shuffledRemainingCards = remainingCards.ToList().FisherYatesShuffle();
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                 var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
+                var playersBestHands = players.Select(player => player.CalculateBestHand()).ToList();
+                
+                Console.WriteLine("");
             }
             
             return new Response

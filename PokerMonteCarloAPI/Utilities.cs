@@ -49,6 +49,11 @@ namespace PokerMonteCarloAPI
             }
         }
 
+        public static (Hand, List<Value>) CalculateBestHand(this Player player)
+        {
+            return (Hand.FourOfAKind, new List<Value> { Value.Ace, Value.Ace, Value.Ace, Value.Ace, Value.King });
+        }
+        
         public static List<T> FisherYatesShuffle<T>(this List<T> listToShuffle, int? seed = null)
         {
             var n = listToShuffle.Count;
