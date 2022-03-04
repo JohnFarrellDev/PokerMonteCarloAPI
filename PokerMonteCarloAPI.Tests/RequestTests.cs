@@ -33,7 +33,7 @@ namespace PokerMonteCarloAPI.Tests
 
         private static object[] invalidPlayerCounts =
         {
-            new object[] {0, "'Players Count' must be greater than or equal to '2'."},
+            new object[] {0, "'Players Count' must be greater than or equal to '2'.\nMust provide at least one player who has not folded"},
             new object[] {1, "'Players Count' must be greater than or equal to '2'."},
             new object[] {15, "'Players Count' must be less than or equal to '14'."},
         };
@@ -211,6 +211,21 @@ namespace PokerMonteCarloAPI.Tests
 
             validationResults.IsValid.Should().BeFalse();
             validationResults.ToString().Should().Be("card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
+        }
+
+        [Test]
+        public void ValidationFailsWhenAllPlayersAreFolded()
+        {
+            var request = new Request
+            {
+                TableCards = new List<Card>(),
+                Players = TestUtilities.GenerateTestPlayers(allCards, _random, 5, 5).ToList()
+            };
+            
+            var validationResults = _validator.Validate(request);
+
+            validationResults.IsValid.Should().BeFalse();
+            validationResults.ToString().Should().Be("Must provide at least one player who has not folded");
         }
     }
 }

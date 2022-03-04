@@ -37,7 +37,12 @@ namespace PokerMonteCarloAPI
             RuleForEach(r => r.Players)
                 .Must(player => player.Cards.Count <= 2)
                 .WithMessage("can only provide at most 2 cards for any player");
-            
+
+            RuleFor(r => r.Players.Count(p => !p.Folded))
+                .GreaterThanOrEqualTo(1)
+                .WithName("Player folded count")
+                .WithMessage("Must provide at least one player who has not folded");
+
             RuleFor(r => r.Players).Must((request, _) =>
                 {
                     foreach (var card in request.Players.SelectMany(player => player.Cards))
