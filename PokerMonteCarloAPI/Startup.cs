@@ -19,6 +19,9 @@ namespace PokerMonteCarloAPI
                     fv.RegisterValidatorsFromAssemblyContaining<Startup>(lifetime: ServiceLifetime.Singleton));
 
             services.AddScoped<IMonte, Monte>();
+
+            services.AddSwaggerDocument(configure => configure.Title = "Poker Monte Carlo API");
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,10 +34,12 @@ namespace PokerMonteCarloAPI
             {
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
         }
         
-        // TODO - generate a normal distribution graph from for our fisher yates test
-        // TODO can the API endpoint accept a QUERY instead of POST
+        
         // TODO Implementation of an API level test
         // TODO API healthcheck endpoint
         // TODO - implement actual monte carlo solution

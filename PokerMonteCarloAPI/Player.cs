@@ -13,5 +13,10 @@ namespace PokerMonteCarloAPI
             PlayersHand = playersHand;
             Folded = folded;
         }
+        
+        public (Hand, List<Value>) CalculateBestHand()
+        {
+            return (Hand.FourOfAKind, new List<Value> { Value.Ace, Value.Ace, Value.Ace, Value.Ace, Value.King });
+        }
     }
 }

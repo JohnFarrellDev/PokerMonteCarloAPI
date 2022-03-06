@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
-#nullable enable
 namespace PokerMonteCarloAPI
 {
     public class Monte : IMonte

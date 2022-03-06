@@ -1,4 +1,3 @@
-#nullable enable
 namespace PokerMonteCarloAPI
 {
     public class Response
