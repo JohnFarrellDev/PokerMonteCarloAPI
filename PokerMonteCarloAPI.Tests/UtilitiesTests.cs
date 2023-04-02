@@ -10,7 +10,7 @@ namespace PokerMonteCarloAPI.Tests
     [TestFixture]
     public class UtilitiesTests
     {
-        private readonly Random Random = new Random();
+        private readonly Random _random = new Random();
         
         [Test]
         public void GenerateAllCardsProduced52DistinctPlayingCards()
@@ -52,7 +52,7 @@ namespace PokerMonteCarloAPI.Tests
             elements.Contains(5).Should().BeFalse();
         }
 
-        private static object[] seededFisherYatesShuffle =
+        private static object[] _seededFisherYatesShuffle =
         {
             new object[] {1, new List<int> {4,3,5,1,2}},
             new object[] {11, new List<int> {4,5,2,1,3}},
@@ -72,7 +72,7 @@ namespace PokerMonteCarloAPI.Tests
             new object[] {33333, new List<int> {5,3,1,2,4}},
             new object[] {333333, new List<int> {3,1,5,4,2}}
         };
-        [TestCaseSource(nameof(seededFisherYatesShuffle))]
+        [TestCaseSource(nameof(_seededFisherYatesShuffle))]
         public void FisherYatesWhenRandomSeededProducesSameOutput(int seed, List<int> expectedOutput)
         {
             var shuffledNumbers1To5 = Enumerable.Range(1, 5).ToList().FisherYatesShuffle(seed);
@@ -91,11 +91,11 @@ namespace PokerMonteCarloAPI.Tests
             for (var i = 0; i < upperIterationBound; i++)
             {
                 // act
-                var numbers1To1_000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
+                var numbers1To1000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
                 
                 for (var j = 0; j < upperBoundOfRangeOfNumbers; j++)
                 {
-                    countNumbersRandomPositionScores[j] += numbers1To1_000[j];
+                    countNumbersRandomPositionScores[j] += numbers1To1000[j];
                 }
             }
             
@@ -117,18 +117,18 @@ namespace PokerMonteCarloAPI.Tests
             Assert.That(percentageOfValuesWithin3StdDeviation, Is.EqualTo(99.7).Within(0.5));
             
             // generate plot to see normal distribution
-            const int bin_width = 2_000;
+            const int binWidth = 2_000;
             
             var binLowerBounds = new List<double>();
-            for (var i = average - average * 0.05; i < average + average * 0.05; i += bin_width)
+            for (var i = average - average * 0.05; i < average + average * 0.05; i += binWidth)
             {
                 binLowerBounds.Add(i);
             }
             
             var binCounts = new List<double>();
-            for (var i = average - average * 0.05; i < average + average * 0.05; i += bin_width)
+            for (var i = average - average * 0.05; i < average + average * 0.05; i += binWidth)
             {
-                binCounts.Add(countNumbersRandomPositionScores.Count(x => x >= i && x < i + bin_width));
+                binCounts.Add(countNumbersRandomPositionScores.Count(x => x >= i && x < i + binWidth));
             }
             
             var plt = new Plot(1200, 800);
@@ -156,7 +156,7 @@ namespace PokerMonteCarloAPI.Tests
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
             
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             while (request.TableCards.Count < 5)
             {
                 request.TableCards.Add(allCards.Pop());
@@ -175,7 +175,7 @@ namespace PokerMonteCarloAPI.Tests
         {
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             request.TableCards = new List<Card>();
             var top5CardsFromDeck = allCards.TakeLast(5).ToList();
             top5CardsFromDeck.Reverse();
@@ -196,7 +196,7 @@ namespace PokerMonteCarloAPI.Tests
             const int numberOfCardsFromDeck = 2;
             
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             request.TableCards = new List<Card>();
             
             while (request.TableCards.Count < numberOfCardsFromRequests)
@@ -220,7 +220,7 @@ namespace PokerMonteCarloAPI.Tests
         {
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
 
             var playerRequest = request.Players[0];
@@ -253,9 +253,9 @@ namespace PokerMonteCarloAPI.Tests
         {
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             request.TableCards = new List<Card>();
-            var deckCardsToBeAdded = allCards.TakeLast(5);
+            var deckCardsToBeAdded = allCards.TakeLast(5).ToList();
 
             var playerRequest = request.Players[0];
             while (playerRequest.Cards.Count < 2)
@@ -287,11 +287,11 @@ namespace PokerMonteCarloAPI.Tests
         {
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             request.Players[0].Cards = new List<Card>();
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
             
-            var cardsToBeAppliedToPlayer = allCards.TakeLast(2);
+            var cardsToBeAppliedToPlayer = allCards.TakeLast(2).ToArray();
             
             var preGeneratingPlayerAllCardsCount = allCards.Count;
 
@@ -317,7 +317,7 @@ namespace PokerMonteCarloAPI.Tests
         {
             // arrange
             var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, _random);
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
 
             // act

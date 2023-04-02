@@ -11,8 +11,6 @@ namespace PokerMonteCarloAPI
             var allCards = Utilities.GenerateAllCards().ToList();
             var remainingCards = RemovePlayerAndTableCards(allCards, request);
             
-            
-            
             // calculate each players best hand
             // first best hand but also 5 highest cards that make the hand
             // determine winner
@@ -25,8 +23,6 @@ namespace PokerMonteCarloAPI
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                 var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
                 var playersBestHands = players.Select(player => player.CalculateBestHand()).ToList();
-                
-                Console.WriteLine("");
             }
             
             return new Response
