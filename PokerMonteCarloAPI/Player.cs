@@ -56,6 +56,9 @@ namespace PokerMonteCarloAPI
             
             
             // calculate if the List<Card> contains a full house
+            var (hasFullHouse, fullHouseHighCards) = HasFullHouse();
+            if(hasFullHouse) return (Hand.FullHouse, fullHouseHighCards!);
+            
             // calculate if the List<Card> contains a flush (DONE)
             if (hasFlush) return (Hand.Flush, anyFlushHighCards!);
             // calculate if the List<Card> contains a straight (DONE)
@@ -156,6 +159,65 @@ namespace PokerMonteCarloAPI
             fourOfAKindCards.Add(highestCard);
     
             return (true, fourOfAKindCards);
+        }
+
+        public (bool, List<byte>?) HasFullHouse()
+        {
+            var threeOfAKindValues = new List<byte>();
+            var pairValues = new List<byte>();
+            
+            // can ignore case with four of a kind as we will have already returned before calling HasFullHouse()
+            foreach (var valueCount in _valueCounts)
+            {
+                switch (valueCount.Value)
+                {
+                    case 3:
+                        threeOfAKindValues.Add((byte)valueCount.Key);
+                        break;
+                    case 2:
+                        pairValues.Add((byte)valueCount.Key);
+                        break;
+                }
+            }
+
+            switch (threeOfAKindValues.Count)
+            {
+                case 0:
+                    return (false, null);
+                case 1 when pairValues.Count == 0:
+                    return (false, null);
+                case 1 when pairValues.Count == 1:
+                {
+                    var threeOfAKindValue = threeOfAKindValues[0];
+                    var pairValue = pairValues[0];
+                    return (true,
+                        new List<byte> { threeOfAKindValue, threeOfAKindValue, threeOfAKindValue, pairValue, pairValue });
+                }
+                case 1 when pairValues.Count == 2:
+                    var pairValue1 = pairValues[0];
+                    var pairValue2 = pairValues[1];
+                    if (pairValue1 > pairValue2)
+                    {
+                        return (true,
+                            new List<byte> { threeOfAKindValues[0], threeOfAKindValues[0], threeOfAKindValues[0], pairValue1, pairValue1 });
+                    }
+                    return (true,
+                        new List<byte> { threeOfAKindValues[0], threeOfAKindValues[0], threeOfAKindValues[0], pairValue2, pairValue2 });
+                case 2:
+                {
+                    var threeOfAKindValue1 = threeOfAKindValues[0];
+                    var threeOfAKindValue2 = threeOfAKindValues[1];
+                    if (threeOfAKindValue1 > threeOfAKindValue2)
+                    {
+                        return (true,
+                            new List<byte> { threeOfAKindValue1, threeOfAKindValue1, threeOfAKindValue1, threeOfAKindValue2, threeOfAKindValue2 });
+                    }
+                    return (true,
+                        new List<byte> { threeOfAKindValue2, threeOfAKindValue2, threeOfAKindValue2, threeOfAKindValue1, threeOfAKindValue1 });
+                }
+                default:
+                    return (false, null);        
+            }
         }
 
         
