@@ -48,7 +48,8 @@ namespace PokerMonteCarloAPI
             if (flushType == Hand.StraightFlush) return (Hand.StraightFlush, anyFlushHighCards!);
             
             // calculate if the List<Card> contains a four of a kind
-            
+            var (hasFourOfAKind, fourOfAKindHighCards) = HasFourOfAKind();
+            if(hasFourOfAKind) return (Hand.FourOfAKind, fourOfAKindHighCards!);
             
             // calculate if the List<Card> contains a full house
             var (hasFullHouse, fullHouseHighCards) = HasFullHouse();
@@ -58,7 +59,8 @@ namespace PokerMonteCarloAPI
             if (hasFlush) return (Hand.Flush, anyFlushHighCards!);
             
             // calculate if the List<Card> contains a straight (DONE)
-            
+            var (hasStraight, straightCards) = HasStraight();
+            if (hasStraight) return (Hand.Straight, straightCards!);
             
             // calculate if the List<Card> contains a three of a kind
             
@@ -118,37 +120,22 @@ namespace PokerMonteCarloAPI
             return (false, null);
         }
         
-        public (bool, List<Card>?) HasFourOfAKind()
+        public (bool, List<byte>?) HasFourOfAKind()
         {
-
             foreach (var count in _valueCounts)
             {
                 if(count.Value != 4) continue;
 
-                return (true, new List<Card>());
+                var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
+                var kicker = _playersHand.Where(card => card.Value != fourOfAKindRank).OrderByDescending(b => b)
+                    .First().Value;
+
+                return (true,
+                    new List<byte>
+                        { fourOfAKindRank, fourOfAKindRank, fourOfAKindRank, fourOfAKindRank, kicker });
             }
 
             return (false, null);
-            
-            var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
-            if (fourOfAKindRank == null)
-            {
-                return (false, new List<Card>());
-            }
-            
-            var x = (int)fourOfAKindRank
-    
-            var fourOfAKindCards = _playersHand.Where(card => card.Value == fourOfAKindRank).ToList();
-    
-            // Get the highest card that is not part of the four of a kind
-            var highestCard = _playersHand.Where(card => card.rank != fourOfAKindRank)
-                .OrderByDescending(card => card.Value)
-                .FirstOrDefault();
-    
-            // Add the highest card to the four of a kind
-            fourOfAKindCards.Add(highestCard);
-    
-            return (true, fourOfAKindCards);
         }
 
         public (bool, List<byte>?) HasFullHouse()
@@ -249,18 +236,13 @@ namespace PokerMonteCarloAPI
         }
 
 
-        public (bool, List<Card>) HasStraight()
+        public (bool, List<byte>) HasStraight()
         {
-            var sortedValues = _sortedDescending.Distinct().ToList();
-            var straightValues = new List<Value>();
-    
-            // Check for Ace low straight
-            var aceLowStraight = new List<Value>() { Value.Five, Value.Four, Value.Three, Value.Two, Value.Ace };
-            if (aceLowStraight.All(sortedValues.Contains))
-            {
-                straightValues = new List<Value>() { Value.Ace, Value.Two, Value.Three, Value.Four, Value.Five };
-            }
-
+            var sortedValues = _playersHand.Select(c => c.Value).Distinct().OrderByDescending(b => b).ToList();
+            
+            // in case of Ace low straight
+            if(sortedValues[0] == 14) sortedValues.Add(1);
+            
             // Check for regular straight
             for (var i = 0; i < sortedValues.Count - 4; i++)
             {
@@ -268,20 +250,15 @@ namespace PokerMonteCarloAPI
                 if (sortedValues[i + 1] != currentVal - 1 || sortedValues[i + 2] != currentVal - 2
                                                           || sortedValues[i + 3] != currentVal - 3 ||
                                                           sortedValues[i + 4] != currentVal - 4) continue;
-                straightValues = new List<Value>() { sortedValues[i], sortedValues[i + 1], sortedValues[i + 2], sortedValues[i + 3], sortedValues[i + 4] };
-                break;
+                return (true,
+                    new List<byte>
+                    {
+                        sortedValues[i], sortedValues[i + 1], sortedValues[i + 2], sortedValues[i + 3],
+                        sortedValues[i + 4]
+                    });
             }
-
-            if(straightValues.Count == 0) return (false, new List<Card>());
             
-            return (true, new List<Card>()
-            {
-                _playersHand.Find(v => v.Value == straightValues[0])!,
-                _playersHand.Find(v => v.Value == straightValues[1])!,
-                _playersHand.Find(v => v.Value == straightValues[2])!,
-                _playersHand.Find(v => v.Value == straightValues[3])!,
-                _playersHand.Find(v => v.Value == straightValues[4])!,
-            });
+            return (false, null);
         }
 
     }
