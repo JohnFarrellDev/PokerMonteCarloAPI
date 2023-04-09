@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +22,8 @@ namespace PokerMonteCarloAPI
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                 var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
                 var playersBestHands = players.Select(player => player.CalculateBestHand()).ToList();
+
+                var x = "hello, world";
             }
             
             return new Response

@@ -40,11 +40,11 @@ namespace PokerMonteCarloAPI
         
         public static IEnumerable<Card> GenerateAllCards()
         {
-            foreach (var suit in Enum.GetValues(typeof(Suit)))
+            for (byte suit = 0; suit < 4; suit++)
             {
-                foreach (var value in Enum.GetValues(typeof(Value)))
+                for (byte value = 2; value < 15; value++)
                 {
-                    yield return new Card((Value)value, (Suit) suit);
+                    yield return new Card(value, suit);
                 }
             }
         }
