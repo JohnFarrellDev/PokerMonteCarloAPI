@@ -34,7 +34,17 @@ namespace PokerMonteCarloAPI
             _sortedDescending = playersHand.Select(c => c.Value).OrderDescending().ToList();
         }
 
-        public (Hand, List<byte>) CalculateBestHand()
+        // 0 highcard
+        // 1 pair
+        // 2 twopair
+        // 3 threeofakind
+        // 4 straight
+        // 5 flush
+        // 6 fullhouse
+        // 7 fourofakind
+        // 8 straightflush
+        // 9 royalflush
+        public (byte, List<byte>) CalculateBestHand()
         {
             // calculate the best poker hand possible from the PLayersHand and the table cards
             // return the best hand and the high cards in order
@@ -42,40 +52,40 @@ namespace PokerMonteCarloAPI
             var (hasFlush, anyFlushHighCards, flushType) = HasAnyFlush();
             
             // calculate if the List<Card> contains a royal flush (DONE)
-            if (flushType == Hand.RoyalFlush) return (Hand.RoyalFlush, anyFlushHighCards!);
+            if (flushType == 9) return (9, anyFlushHighCards!);
             
             // calculate if the List<Card> contains a straight flush (DONE)
-            if (flushType == Hand.StraightFlush) return (Hand.StraightFlush, anyFlushHighCards!);
+            if (flushType == 8) return (8, anyFlushHighCards!);
             
             // calculate if the List<Card> contains a four of a kind (DONE)
             var (hasFourOfAKind, fourOfAKindHighCards) = HasFourOfAKind();
-            if(hasFourOfAKind) return (Hand.FourOfAKind, fourOfAKindHighCards!);
+            if(hasFourOfAKind) return (7, fourOfAKindHighCards!);
             
             // calculate if the List<Card> contains a full house (DONE)
             var (hasFullHouse, fullHouseHighCards) = HasFullHouse();
-            if(hasFullHouse) return (Hand.FullHouse, fullHouseHighCards!);
+            if(hasFullHouse) return (6, fullHouseHighCards!);
             
             // calculate if the List<Card> contains a flush (DONE)
-            if (hasFlush) return (Hand.Flush, anyFlushHighCards!);
+            if (hasFlush) return (5, anyFlushHighCards!);
             
             // calculate if the List<Card> contains a straight (DONE)
             var (hasStraight, straightCards) = HasStraight();
-            if (hasStraight) return (Hand.Straight, straightCards!);
+            if (hasStraight) return (4, straightCards!);
             
             // calculate if the List<Card> contains a three of a kind
             var (hasThreeOfAKind, threeOfAKindHighCards) = HasThreeOfAKind();
-            if(hasThreeOfAKind) return (Hand.ThreeOfAKind, threeOfAKindHighCards!);
+            if(hasThreeOfAKind) return (3, threeOfAKindHighCards!);
             
             // calculate if the List<Card> contains a two pair
             var (hasTwoPair, twoPairHighCards) = HasTwoPair();
-            if(hasTwoPair) return (Hand.TwoPair, twoPairHighCards!);
+            if(hasTwoPair) return (2, twoPairHighCards!);
             
             // calculate if the List<Card> contains a pair
             var (hasPair, pairHighCards) = HasPair();
-            if(hasPair) return (Hand.Pair, pairHighCards!);
+            if(hasPair) return (1, pairHighCards!);
             
             // calculate if the List<Card> contains a high card
-            return (Hand.HighCard, _sortedDescending.Take(5).ToList());
+            return (0, _sortedDescending.Take(5).ToList());
         }
 
         // flushCards will always be belonging to the same Suit
@@ -200,7 +210,7 @@ namespace PokerMonteCarloAPI
             }
         }
         
-        public (bool, List<byte>?, Hand?) HasAnyFlush()
+        public (bool, List<byte>?, byte?) HasAnyFlush()
         {
             // 99 is used to represent no suit being selected (Suit representation of our card, possible values are Clubs (0), Spades (1), Diamonds (2) and Hearts (3))
             byte flushSuit = 99;
@@ -223,18 +233,18 @@ namespace PokerMonteCarloAPI
             var (hasRoyalFlush, royalFlushCards) = HasRoyalFlush(flushCards);
             if (hasRoyalFlush)
             {
-                return (true, royalFlushCards, Hand.RoyalFlush);
+                return (true, royalFlushCards, 9);
             }
             
             // check for straight flush
             var (hasStraightFlush, straightFlushCards) = HasStraightFlush(flushCards);
             if (hasStraightFlush)
             {
-                return (true, straightFlushCards, Hand.StraightFlush);
+                return (true, straightFlushCards, 8);
             }
             
             // Return true and the 5 highest cards of the flush suit
-            return (true, flushCards.Select(card => card.Value).OrderDescending().Take(5).ToList(), Hand.Flush);
+            return (true, flushCards.Select(card => card.Value).OrderDescending().Take(5).ToList(), 5);
         }
 
 
