@@ -67,7 +67,8 @@ namespace PokerMonteCarloAPI
             if(hasThreeOfAKind) return (Hand.ThreeOfAKind, threeOfAKindHighCards!);
             
             // calculate if the List<Card> contains a two pair
-            
+            var (hasTwoPair, twoPairHighCards) = HasTwoPair();
+            if(hasTwoPair) return (Hand.TwoPair, twoPairHighCards!);
             
             // calculate if the List<Card> contains a pair
             
@@ -282,5 +283,31 @@ namespace PokerMonteCarloAPI
             return (false, null);
         }
 
+        // do not bother to check for a value count of 3 or 4 as would have already returned with HasFourOfAKind() or HasThreeOfAKind()
+        public (bool, List<byte>?) HasTwoPair()
+        {
+            var pairValues = new List<byte>();
+            foreach (var valueCount in _valueCounts)
+            {
+                if (valueCount.Value != 2) continue;
+                pairValues.Add(valueCount.Key);
+            }
+
+            if (pairValues.Count < 2) return (false, null);
+            
+            var pairValuesSortedDescending = pairValues.OrderByDescending(b => b).ToList();
+            
+            var kicker = _playersHand
+                .Where(card => card.Value != pairValuesSortedDescending[0] && 
+                               card.Value != pairValuesSortedDescending[1] && 
+                               card.Value != pairValuesSortedDescending[2])
+                .OrderByDescending(b => b)
+                .First().Value;
+
+            return (true,
+                new List<byte>
+                    { pairValues[0], pairValues[0], pairValues[1], pairValues[1], kicker });
+        }
+        
     }
 }
