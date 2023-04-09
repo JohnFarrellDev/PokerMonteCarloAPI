@@ -6,33 +6,33 @@ namespace PokerMonteCarloAPI
     {
         
         [JsonProperty("winCount")]
-        public int winCount { get; set; }
+        public int WinCount { get; set; }
         
         [JsonProperty("loseCount")]
-        public int loseCount { get; set; }
+        public int LoseCount { get; set; }
         
         [JsonProperty("twoWayTieCount")]
-        public int twoWayTieCount { get; set; }
+        public int TwoWayTieCount { get; set; }
         
         [JsonProperty("threeWayTieCount")]
-        public int threeWayTieCount { get; set; }
+        public int ThreeWayTieCount { get; set; }
         
         [JsonProperty("fourWayTieCount")]
-        public int fourWayTieCount { get; set; }
+        public int FourWayTieCount { get; set; }
         
         [JsonProperty("fiveWayTieCount")]
-        public int fiveWayTieCount { get; set; }
+        public int FiveWayTieCount { get; set; }
         
         [JsonProperty("sixWayTieCount")]
-        public int sixWayTieCount { get; set; }
+        public int SixWayTieCount { get; set; }
         
         [JsonProperty("sevenWayTieCount")]
-        public int sevenWayTieCount { get; set; }
+        public int SevenWayTieCount { get; set; }
         
         [JsonProperty("eightWayTieCount")]
-        public int eightWayTieCount { get; set; }
+        public int EightWayTieCount { get; set; }
         
         [JsonProperty("nineWayTieCount")]
-        public int nineWayTieCount { get; set; }
+        public int NineWayTieCount { get; set; }
     }
 }
