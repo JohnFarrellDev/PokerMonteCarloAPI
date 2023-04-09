@@ -47,11 +47,11 @@ namespace PokerMonteCarloAPI
             // calculate if the List<Card> contains a straight flush (DONE)
             if (flushType == Hand.StraightFlush) return (Hand.StraightFlush, anyFlushHighCards!);
             
-            // calculate if the List<Card> contains a four of a kind
+            // calculate if the List<Card> contains a four of a kind (DONE)
             var (hasFourOfAKind, fourOfAKindHighCards) = HasFourOfAKind();
             if(hasFourOfAKind) return (Hand.FourOfAKind, fourOfAKindHighCards!);
             
-            // calculate if the List<Card> contains a full house
+            // calculate if the List<Card> contains a full house (DONE)
             var (hasFullHouse, fullHouseHighCards) = HasFullHouse();
             if(hasFullHouse) return (Hand.FullHouse, fullHouseHighCards!);
             
@@ -63,7 +63,8 @@ namespace PokerMonteCarloAPI
             if (hasStraight) return (Hand.Straight, straightCards!);
             
             // calculate if the List<Card> contains a three of a kind
-            
+            var (hasThreeOfAKind, threeOfAKindHighCards) = HasThreeOfAKind();
+            if(hasThreeOfAKind) return (Hand.ThreeOfAKind, threeOfAKindHighCards!);
             
             // calculate if the List<Card> contains a two pair
             
@@ -149,10 +150,10 @@ namespace PokerMonteCarloAPI
                 switch (valueCount.Value)
                 {
                     case 3:
-                        threeOfAKindValues.Add((byte)valueCount.Key);
+                        threeOfAKindValues.Add(valueCount.Key);
                         break;
                     case 2:
-                        pairValues.Add((byte)valueCount.Key);
+                        pairValues.Add(valueCount.Key);
                         break;
                 }
             }
@@ -196,10 +197,10 @@ namespace PokerMonteCarloAPI
                     return (false, null);        
             }
         }
-
         
         public (bool, List<byte>?, Hand?) HasAnyFlush()
         {
+            // 5 is used to represent no suit being selected (Suit representation of our card, possible values are Clubs (0), Spades (1), Diamonds (2) and Hearts (3))
             byte flushSuit = 5;
             foreach (var count in _suitCounts)
             {
@@ -236,7 +237,7 @@ namespace PokerMonteCarloAPI
         }
 
 
-        public (bool, List<byte>) HasStraight()
+        public (bool, List<byte>?) HasStraight()
         {
             var sortedValues = _playersHand.Select(c => c.Value).Distinct().OrderByDescending(b => b).ToList();
             
@@ -258,6 +259,26 @@ namespace PokerMonteCarloAPI
                     });
             }
             
+            return (false, null);
+        }
+        
+        // Do not bother to check for pair or additional three of a kind as we would have already checked when calling HasFullHouse()
+        public (bool, List<byte>?) HasThreeOfAKind()
+        {
+            foreach (var count in _valueCounts)
+            {
+                if(count.Value != 3) continue;
+
+                var threeOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 3).Key;
+                var descendingHighCards = _playersHand.Where(card => card.Value != threeOfAKindRank).OrderByDescending(b => b).ToList();
+                var kicker1 = descendingHighCards[0].Value;
+                var kicker2 = descendingHighCards[1].Value;
+
+                return (true,
+                    new List<byte>
+                        { threeOfAKindRank, threeOfAKindRank, threeOfAKindRank, kicker1, kicker2 });
+            }
+
             return (false, null);
         }
 
