@@ -1,8 +1,10 @@
 #nullable enable
+using System.Collections.Generic;
+
 namespace PokerMonteCarloAPI
 {
     public interface IMonte
     {
-        Response Carlo(Request request, int numberOfSimulations = 10_000);
+        List<PlayerResult> Carlo(Request request);
     }
 }

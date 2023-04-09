@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace PokerMonteCarloAPI
         [Route("monte")]
         [HttpPost]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<PlayerResult>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationResult), StatusCodes.Status400BadRequest)]
         public IActionResult MonteCarlo([FromBody] Request request)
         {
