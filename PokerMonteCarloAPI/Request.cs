@@ -47,13 +47,13 @@ namespace PokerMonteCarloAPI
                 {
                     foreach (var card in request.Players.SelectMany(player => player.Cards))
                     {
-                        if ((int)card.value < 2 || (int)card.value > 14) return false;
-                        if ((int)card.suit < 0 || (int)card.suit > 3) return false;
+                        if ((int)card.Value < 2 || (int)card.Value > 14) return false;
+                        if ((int)card.Suit < 0 || (int)card.Suit > 3) return false;
                     }
                     foreach (var card in request.TableCards)
                     {
-                        if ((int)card.value < 2 || (int)card.value > 14) return false;
-                        if ((int)card.suit < 0 || (int)card.suit > 3) return false;
+                        if ((int)card.Value < 2 || (int)card.Value > 14) return false;
+                        if ((int)card.Suit < 0 || (int)card.Suit > 3) return false;
                     }
                     return true;
                 })
