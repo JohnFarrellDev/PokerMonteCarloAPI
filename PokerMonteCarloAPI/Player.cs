@@ -74,8 +74,8 @@ namespace PokerMonteCarloAPI
             var (hasPair, pairHighCards) = HasPair();
             if(hasPair) return (Hand.Pair, pairHighCards!);
             
-            
             // calculate if the List<Card> contains a high card
+            return (Hand.HighCard, _sortedDescending.Take(5).ToList());
         }
 
         // flushCards will always be belonging to the same Suit
@@ -102,7 +102,7 @@ namespace PokerMonteCarloAPI
         // flushCards will always be belonging to the same Suit
         public (bool, List<byte>?) HasStraightFlush(List<Card> flushCards)
         {
-            var sortedValues = flushCards.Select(c => c.Value).Distinct().OrderByDescending(b => b).ToList();
+            var sortedValues = flushCards.Select(c => c.Value).Distinct().OrderDescending().ToList();
             // in case of Ace low straight
             if(sortedValues[0] == 14) sortedValues.Add(1);
             
@@ -131,8 +131,7 @@ namespace PokerMonteCarloAPI
                 if(count.Value != 4) continue;
 
                 var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
-                var kicker = _playersHand.Where(card => card.Value != fourOfAKindRank).OrderByDescending(b => b)
-                    .First().Value;
+                var kicker = _playersHand.Where(card => card.Value != fourOfAKindRank).OrderDescending().First().Value;
 
                 return (true,
                     new List<byte>
@@ -235,14 +234,13 @@ namespace PokerMonteCarloAPI
             }
             
             // Return true and the 5 highest cards of the flush suit
-            return (true, straightFlushCards!.OrderByDescending(v => v)
-                .Take(5).ToList(), Hand.Flush);
+            return (true, straightFlushCards!.OrderDescending().Take(5).ToList(), Hand.Flush);
         }
 
 
         public (bool, List<byte>?) HasStraight()
         {
-            var sortedValues = _playersHand.Select(c => c.Value).Distinct().OrderByDescending(b => b).ToList();
+            var sortedValues = _sortedDescending.Distinct().ToList();
             
             // in case of Ace low straight
             if(sortedValues[0] == 14) sortedValues.Add(1);
@@ -273,9 +271,9 @@ namespace PokerMonteCarloAPI
                 if(count.Value != 3) continue;
 
                 var threeOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 3).Key;
-                var descendingHighCards = _playersHand.Where(card => card.Value != threeOfAKindRank).OrderByDescending(b => b).ToList();
-                var kicker1 = descendingHighCards[0].Value;
-                var kicker2 = descendingHighCards[1].Value;
+                var descendingHighCards = _sortedDescending.Where(value => value != threeOfAKindRank).ToList();
+                var kicker1 = descendingHighCards[0];
+                var kicker2 = descendingHighCards[1];
 
                 return (true,
                     new List<byte>
@@ -297,18 +295,18 @@ namespace PokerMonteCarloAPI
 
             if (pairValues.Count < 2) return (false, null);
             
-            var pairValuesSortedDescending = pairValues.OrderByDescending(b => b).ToList();
+            var pairValuesSortedDescending = pairValues.OrderDescending().ToList();
             
-            var kicker = _playersHand
-                .Where(card => card.Value != pairValuesSortedDescending[0] && 
-                               card.Value != pairValuesSortedDescending[1] && 
-                               card.Value != pairValuesSortedDescending[2])
-                .OrderByDescending(b => b)
-                .First().Value;
-
+            var kicker = _sortedDescending
+                .Where(value => value != pairValuesSortedDescending[0] && 
+                                value != pairValuesSortedDescending[1] && 
+                                value != pairValuesSortedDescending[2])
+                .OrderDescending()
+                .First();
+            
             return (true,
                 new List<byte>
-                    { pairValues[0], pairValues[0], pairValues[1], pairValues[1], kicker });
+                    { pairValuesSortedDescending[0], pairValuesSortedDescending[0], pairValuesSortedDescending[1], pairValuesSortedDescending[1], kicker });
         }
         
         // Will have already checked for four of a kind, three of a kind and two pairs
