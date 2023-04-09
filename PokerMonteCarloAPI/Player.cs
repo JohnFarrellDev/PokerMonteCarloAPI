@@ -71,6 +71,8 @@ namespace PokerMonteCarloAPI
             if(hasTwoPair) return (Hand.TwoPair, twoPairHighCards!);
             
             // calculate if the List<Card> contains a pair
+            var (hasPair, pairHighCards) = HasPair();
+            if(hasPair) return (Hand.Pair, pairHighCards!);
             
             
             // calculate if the List<Card> contains a high card
@@ -307,6 +309,26 @@ namespace PokerMonteCarloAPI
             return (true,
                 new List<byte>
                     { pairValues[0], pairValues[0], pairValues[1], pairValues[1], kicker });
+        }
+        
+        // Will have already checked for four of a kind, three of a kind and two pairs
+        public (bool, List<byte>?) HasPair()
+        {
+            foreach (var count in _valueCounts)
+            {
+                if (count.Value != 2) continue;
+                var pairRank = _valueCounts.First(x => x.Value == 2).Key;
+                var descendingHighCards = _playersHand.Where(card => card.Value != pairRank).OrderByDescending(b => b).ToList();
+                var kicker1 = descendingHighCards[0].Value;
+                var kicker2 = descendingHighCards[1].Value;
+                var kicker3 = descendingHighCards[2].Value;
+
+                return (true,
+                    new List<byte>
+                        { pairRank, pairRank, kicker1, kicker2, kicker3 });
+            }
+
+            return (false, null);
         }
         
     }
