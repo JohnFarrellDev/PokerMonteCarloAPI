@@ -131,7 +131,7 @@ namespace PokerMonteCarloAPI
                 if(count.Value != 4) continue;
 
                 var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
-                var kicker = _playersHand.Where(card => card.Value != fourOfAKindRank).OrderDescending().First().Value;
+                var kicker = _playersHand.Select(card => card.Value).Where(value => value != fourOfAKindRank).OrderDescending().First();
 
                 return (true,
                     new List<byte>
@@ -202,8 +202,8 @@ namespace PokerMonteCarloAPI
         
         public (bool, List<byte>?, Hand?) HasAnyFlush()
         {
-            // 5 is used to represent no suit being selected (Suit representation of our card, possible values are Clubs (0), Spades (1), Diamonds (2) and Hearts (3))
-            byte flushSuit = 5;
+            // 99 is used to represent no suit being selected (Suit representation of our card, possible values are Clubs (0), Spades (1), Diamonds (2) and Hearts (3))
+            byte flushSuit = 99;
             foreach (var count in _suitCounts)
             {
                 if (count.Value < 5) continue;
@@ -211,7 +211,7 @@ namespace PokerMonteCarloAPI
                 break;
             }
             
-            if (flushSuit == 5)
+            if (flushSuit == 99)
             {
                 return (false, null, null);
             }
@@ -234,7 +234,7 @@ namespace PokerMonteCarloAPI
             }
             
             // Return true and the 5 highest cards of the flush suit
-            return (true, straightFlushCards!.OrderDescending().Take(5).ToList(), Hand.Flush);
+            return (true, flushCards.Select(card => card.Value).OrderDescending().Take(5).ToList(), Hand.Flush);
         }
 
 
@@ -297,12 +297,18 @@ namespace PokerMonteCarloAPI
             
             var pairValuesSortedDescending = pairValues.OrderDescending().ToList();
             
-            var kicker = _sortedDescending
+            var kicker = pairValues.Count == 2  ? _sortedDescending
                 .Where(value => value != pairValuesSortedDescending[0] && 
-                                value != pairValuesSortedDescending[1] && 
-                                value != pairValuesSortedDescending[2])
+                                value != pairValuesSortedDescending[1])
                 .OrderDescending()
-                .First();
+                .First()
+                :
+                _sortedDescending
+                    .Where(value => value != pairValuesSortedDescending[0] && 
+                                    value != pairValuesSortedDescending[1] && 
+                                    value != pairValuesSortedDescending[2])
+                    .OrderDescending()
+                    .First();
             
             return (true,
                 new List<byte>
@@ -316,10 +322,10 @@ namespace PokerMonteCarloAPI
             {
                 if (count.Value != 2) continue;
                 var pairRank = _valueCounts.First(x => x.Value == 2).Key;
-                var descendingHighCards = _playersHand.Where(card => card.Value != pairRank).OrderByDescending(b => b).ToList();
-                var kicker1 = descendingHighCards[0].Value;
-                var kicker2 = descendingHighCards[1].Value;
-                var kicker3 = descendingHighCards[2].Value;
+                var descendingHighCards = _sortedDescending.Where(value => value != pairRank).ToList();
+                var kicker1 = descendingHighCards[0];
+                var kicker2 = descendingHighCards[1];
+                var kicker3 = descendingHighCards[2];
 
                 return (true,
                     new List<byte>

@@ -5,7 +5,7 @@ namespace PokerMonteCarloAPI
 {
     public class Monte : IMonte
     {
-        public Response Carlo(Request request, int numberOfSimulations = 10_000)
+        public Response Carlo(Request request, int numberOfSimulations = 1_000_000)
         {
             var allCards = Utilities.GenerateAllCards().ToList();
             var remainingCards = RemovePlayerAndTableCards(allCards, request);
@@ -22,8 +22,6 @@ namespace PokerMonteCarloAPI
                 var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                 var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
                 var playersBestHands = players.Select(player => player.CalculateBestHand()).ToList();
-
-                var x = "hello, world";
             }
             
             return new Response
