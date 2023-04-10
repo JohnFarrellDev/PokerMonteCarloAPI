@@ -28,8 +28,8 @@ namespace PokerMonteCarloAPI.Tests
         public void WhenMonteReturnsAResponseTheControllerReturnsTheResponseObjectWithA200()
         {
             var request = TestUtilities.GenerateRequest(allCards, Random);
-            var expectedResponse = TestUtilities.GenerateResponse();
-            _mockMonte.Setup(x => x.Carlo(request, 10_000)).Returns(expectedResponse);
+            var expectedResponse = TestUtilities.GenerateListPlayerResult(request.Players.Count);
+            _mockMonte.Setup(x => x.Carlo(request)).Returns(expectedResponse);
 
             var response = _controller.MonteCarlo(request) as ObjectResult;
 
@@ -41,11 +41,11 @@ namespace PokerMonteCarloAPI.Tests
         public void WhenMonteCarloIsCalledTheMonteServiceIsCalledWithTheSameRequestObject()
         {
             var request = TestUtilities.GenerateRequest(allCards, Random);
-            _mockMonte.Setup(x => x.Carlo(request, 10_000));
+            _mockMonte.Setup(x => x.Carlo(request));
 
             _controller.MonteCarlo(request);
 
-            _mockMonte.Verify(x => x.Carlo(request, 10_000));
+            _mockMonte.Verify(x => x.Carlo(request));
         }
     }
 }

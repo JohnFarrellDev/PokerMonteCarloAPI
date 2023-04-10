@@ -6,7 +6,7 @@ namespace PokerMonteCarloAPI
 {
     public class Player
     {
-        private readonly List<Card> _playersHand;
+        public List<Card> PlayersHand { get; }
         private readonly bool _folded;
         private readonly Dictionary<byte, byte> _valueCounts;
         private readonly Dictionary<byte, byte> _suitCounts;
@@ -14,7 +14,7 @@ namespace PokerMonteCarloAPI
 
         public Player(List<Card> playersHand, bool folded)
         {
-            _playersHand = playersHand;
+            PlayersHand = playersHand;
             _folded = folded;
             _valueCounts = new Dictionary<byte, byte>();
             _suitCounts = new Dictionary<byte, byte>();
@@ -144,7 +144,7 @@ namespace PokerMonteCarloAPI
                 if(count.Value != 4) continue;
 
                 var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
-                var kicker = _playersHand.Select(card => card.Value).Where(value => value != fourOfAKindRank).OrderDescending().First();
+                var kicker = PlayersHand.Select(card => card.Value).Where(value => value != fourOfAKindRank).OrderDescending().First();
 
                 return (true,
                     new List<byte>
@@ -230,7 +230,7 @@ namespace PokerMonteCarloAPI
             }
             
             // Get the cards of the flush suit
-            var flushCards = _playersHand.Where(card => card.Suit == flushSuit).ToList();
+            var flushCards = PlayersHand.Where(card => card.Suit == flushSuit).ToList();
 
             // check for royal flush
             var (hasRoyalFlush, royalFlushCards) = HasRoyalFlush(flushCards);

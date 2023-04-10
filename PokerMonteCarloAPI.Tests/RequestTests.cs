@@ -133,7 +133,7 @@ namespace PokerMonteCarloAPI.Tests
         public void ValidationFailsWhenCardValueIsNotValidForAnyPlayerCards()
         {
             var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
-            players[0].Cards = new List<Card> { new Card((Value) 15, Suit.Diamonds) };
+            players[0].Cards = new List<Card> { new Card(15, 2) };
 
             var request = new Request
             {
@@ -151,7 +151,7 @@ namespace PokerMonteCarloAPI.Tests
         public void ValidationFailsWhenCardSuitIsNotValidForAnyPlayerCards()
         {
             var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
-            players[0].Cards = new List<Card> { new Card(Value.Ace, (Suit) 4) };
+            players[0].Cards = new List<Card> { new Card(14, 5) };
 
             var request = new Request
             {
@@ -190,7 +190,7 @@ namespace PokerMonteCarloAPI.Tests
         {
             var request = new Request
             {
-                TableCards = new List<Card> { new Card((Value) 15, Suit.Hearts) },
+                TableCards = new List<Card> { new Card(15, 1) },
                 Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
             };
             
@@ -205,7 +205,7 @@ namespace PokerMonteCarloAPI.Tests
         {
             var request = new Request
             {
-                TableCards = new List<Card> { new Card(Value.Ace, (Suit) 4) },
+                TableCards = new List<Card> { new Card(14, 4) },
                 Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
             };
 

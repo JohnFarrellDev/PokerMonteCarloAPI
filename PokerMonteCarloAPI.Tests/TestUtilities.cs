@@ -16,15 +16,30 @@ namespace PokerMonteCarloAPI.Tests
             };
         }
 
-        public static Response GenerateResponse()
+        public static List<PlayerResult> GenerateListPlayerResult(int numberOfPlayers)
         {
-            return new Response
+            var playerResults = new List<PlayerResult>();
+            for (var i = 0; i < numberOfPlayers; i++)
             {
-                Id = 1,
-                Test = "hello world"
-            };
+                playerResults.Add(new PlayerResult
+                {
+                    WinCount = 0,
+                    LoseCount = 0,
+                    TwoWayTieCount = 0,
+                    ThreeWayTieCount = 0,
+                    FourWayTieCount = 0,
+                    FiveWayTieCount = 0,
+                    SixWayTieCount = 0,
+                    SevenWayTieCount = 0,
+                    EightWayTieCount = 0,
+                    NineWayTieCount = 0
+                });
+            }
+
+            return playerResults;
         }
-        
+
+
         public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, Random random)
         {
             for(var i = 0; i < random.Next(6); i++)
