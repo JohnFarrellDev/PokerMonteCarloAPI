@@ -31,7 +31,7 @@ namespace PokerMonteCarloAPI
                 }
                 _suitCounts[card.Suit]++;
             }
-            _sortedDescending = playersHand.Select(c => c.Value).OrderDescending().ToList();
+            _sortedDescending = playersHand.Select(c => c.Value).OrderByDescending(v => v).ToList();
         }
 
         // 0 folded
@@ -115,7 +115,7 @@ namespace PokerMonteCarloAPI
         // flushCards will always be belonging to the same Suit
         public (bool, List<byte>?) HasStraightFlush(List<Card> flushCards)
         {
-            var sortedValues = flushCards.Select(c => c.Value).Distinct().OrderDescending().ToList();
+            var sortedValues = flushCards.Select(c => c.Value).Distinct().OrderByDescending(v => v).ToList();
             // in case of Ace low straight
             if(sortedValues[0] == 14) sortedValues.Add(1);
             
@@ -144,7 +144,7 @@ namespace PokerMonteCarloAPI
                 if(count.Value != 4) continue;
 
                 var fourOfAKindRank = _valueCounts.FirstOrDefault(x => x.Value == 4).Key;
-                var kicker = PlayersHand.Select(card => card.Value).Where(value => value != fourOfAKindRank).OrderDescending().First();
+                var kicker = PlayersHand.Select(card => card.Value).Where(value => value != fourOfAKindRank).MaxBy(v => v);
 
                 return (true,
                     new List<byte>
@@ -247,7 +247,7 @@ namespace PokerMonteCarloAPI
             }
             
             // Return true and the 5 highest cards of the flush suit
-            return (true, flushCards.Select(card => card.Value).OrderDescending().Take(5).ToList(), 6);
+            return (true, flushCards.Select(card => card.Value).OrderByDescending(v => v).Take(5).ToList(), 6);
         }
 
 
@@ -308,20 +308,16 @@ namespace PokerMonteCarloAPI
 
             if (pairValues.Count < 2) return (false, null);
             
-            var pairValuesSortedDescending = pairValues.OrderDescending().ToList();
+            var pairValuesSortedDescending = pairValues.OrderByDescending(v => v).ToList();
             
             var kicker = pairValues.Count == 2  ? _sortedDescending
-                .Where(value => value != pairValuesSortedDescending[0] && 
-                                value != pairValuesSortedDescending[1])
-                .OrderDescending()
-                .First()
+                    .Where(value => value != pairValuesSortedDescending[0] && 
+                                    value != pairValuesSortedDescending[1]).MaxBy(v => v)
                 :
                 _sortedDescending
                     .Where(value => value != pairValuesSortedDescending[0] && 
                                     value != pairValuesSortedDescending[1] && 
-                                    value != pairValuesSortedDescending[2])
-                    .OrderDescending()
-                    .First();
+                                    value != pairValuesSortedDescending[2]).MaxBy(v => v);
             
             return (true,
                 new List<byte>
