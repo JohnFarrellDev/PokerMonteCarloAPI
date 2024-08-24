@@ -14,18 +14,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(13, 1),
-                new Card(12, 1),
-                new Card(11, 1),
-                new Card(10, 1)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.Queen, Suit.Hearts),
+                new Card(Value.Jack, Suit.Hearts),
+                new Card(Value.Ten, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(10);
-        result.Item2.Should().Equal(new List<byte>() {14,13,12,11,10});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.King, Value.Queen, Value.Jack, Value.Ten});
     }
 
     [Test]
@@ -35,18 +35,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(13, 1),
-                new Card(12, 1),
-                new Card(11, 1),
-                new Card(10, 1),
-                new Card(9, 1)
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.Queen, Suit.Hearts),
+                new Card(Value.Jack, Suit.Hearts),
+                new Card(Value.Ten, Suit.Hearts),
+                new Card(Value.Nine, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(9);
-        result.Item2.Should().Equal(new List<byte>() {13,12,11,10,9});
+        result.Item2.Should().Equal(new List<Value>() {Value.King, Value.Queen, Value.Jack, Value.Ten, Value.Nine});
     }
 
     [Test]
@@ -56,18 +56,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(14, 2),
-                new Card(14, 3),
-                new Card(14, 4),
-                new Card(13, 2)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ace, Suit.Diamonds),
+                new Card(Value.Ace, Suit.Clubs),
+                new Card(Value.Ace, Suit.Spades),
+                new Card(Value.King, Suit.Diamonds)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(8);
-        result.Item2.Should().Equal(new List<byte>() {14,14,14,14,13});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ace, Value.Ace, Value.Ace, Value.King});
     }
 
     [Test]
@@ -77,18 +77,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(14, 2),
-                new Card(14, 3),
-                new Card(13, 1),
-                new Card(13, 2)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ace, Suit.Diamonds),
+                new Card(Value.Ace, Suit.Clubs),
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.King, Suit.Diamonds)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(7);
-        result.Item2.Should().Equal(new List<byte>() {14,14,14,13,13});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ace, Value.Ace, Value.King, Value.King});
     }
 
     [Test]
@@ -98,18 +98,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(10, 1),
-                new Card(8, 1),
-                new Card(6, 1),
-                new Card(4, 1)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ten, Suit.Hearts),
+                new Card(Value.Eight, Suit.Hearts),
+                new Card(Value.Six, Suit.Hearts),
+                new Card(Value.Four, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(6);
-        result.Item2.Should().Equal(new List<byte>() {14,10,8,6,4});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ten, Value.Eight, Value.Six, Value.Four});
     }
 
     [Test]
@@ -119,18 +119,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(13, 2),
-                new Card(12, 3),
-                new Card(11, 4),
-                new Card(10, 1)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.King, Suit.Diamonds),
+                new Card(Value.Queen, Suit.Clubs),
+                new Card(Value.Jack, Suit.Spades),
+                new Card(Value.Ten, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(5);
-        result.Item2.Should().Equal(new List<byte>() {14,13,12,11,10});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.King, Value.Queen, Value.Jack, Value.Ten});
     }
 
     [Test]
@@ -140,18 +140,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(5, 1),
-                new Card(4, 2),
-                new Card(3, 3),
-                new Card(2, 4),
-                new Card(14, 1)
+                new Card(Value.Five, Suit.Hearts),
+                new Card(Value.Four, Suit.Diamonds),
+                new Card(Value.Three, Suit.Clubs),
+                new Card(Value.Two, Suit.Spades),
+                new Card(Value.Ace, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(5); // Straight
-        result.Item2.Should().Equal(new List<byte>() {5,4,3,2,14});
+        result.Item2.Should().Equal(new List<Value>() {Value.Five, Value.Four, Value.Three, Value.Two, Value.LowAce});
     }
 
     [Test]
@@ -161,20 +161,20 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(13, 1),
-                new Card(12, 2),
-                new Card(11, 1),
-                new Card(10, 1),
-                new Card(9, 1),
-                new Card(8, 2)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.Queen, Suit.Diamonds),
+                new Card(Value.Jack, Suit.Hearts),
+                new Card(Value.Ten, Suit.Hearts),
+                new Card(Value.Nine, Suit.Hearts),
+                new Card(Value.Eight, Suit.Diamonds)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(6);
-        result.Item2.Should().Equal(new List<byte>() {14,13,11,10,9});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.King, Value.Jack, Value.Ten, Value.Nine});
     }
 
     [Test]
@@ -184,18 +184,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(14, 2),
-                new Card(14, 3),
-                new Card(12, 1),
-                new Card(10, 2)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ace, Suit.Diamonds),
+                new Card(Value.Ace, Suit.Clubs),
+                new Card(Value.Queen, Suit.Hearts),
+                new Card(Value.Ten, Suit.Diamonds)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(4);
-        result.Item2.Should().Equal(new List<byte>() {14,14,14,12,10});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ace, Value.Ace, Value.Queen, Value.Ten});
     }
 
     [Test]
@@ -205,18 +205,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(14, 2),
-                new Card(13, 1),
-                new Card(13, 2),
-                new Card(10, 3)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ace, Suit.Diamonds),
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.King, Suit.Diamonds),
+                new Card(Value.Ten, Suit.Clubs)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(3);
-        result.Item2.Should().Equal(new List<byte>() {14,14,13,13,10});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ace, Value.King, Value.King, Value.Ten});
     }
 
     [Test]
@@ -226,18 +226,18 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(14, 2),
-                new Card(13, 1),
-                new Card(12, 2),
-                new Card(10, 3)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.Ace, Suit.Diamonds),
+                new Card(Value.King, Suit.Hearts),
+                new Card(Value.Queen, Suit.Diamonds),
+                new Card(Value.Ten, Suit.Clubs)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(2);
-        result.Item2.Should().Equal(new List<byte>() {14,14,13,12,10});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.Ace, Value.King, Value.Queen, Value.Ten});
     }
 
     [Test]
@@ -247,17 +247,17 @@ public class PlayerTests
         (
             new List<Card>()
             {
-                new Card(14, 1),
-                new Card(13, 2),
-                new Card(11, 3),
-                new Card(9, 4),
-                new Card(7, 1)
+                new Card(Value.Ace, Suit.Hearts),
+                new Card(Value.King, Suit.Diamonds),
+                new Card(Value.Jack, Suit.Spades),
+                new Card(Value.Nine, Suit.Clubs),
+                new Card(Value.Seven, Suit.Hearts)
             }, false
         );
 
         var result = player.CalculateBestHand();
 
         result.Item1.Should().Be(1);
-        result.Item2.Should().Equal(new List<byte>() {14,13,11,9,7});
+        result.Item2.Should().Equal(new List<Value>() {Value.Ace, Value.King, Value.Jack, Value.Nine, Value.Seven});
     }
 }

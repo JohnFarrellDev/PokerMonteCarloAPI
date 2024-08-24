@@ -7,19 +7,19 @@ namespace PokerMonteCarloAPI
     public class Card
     {
         /// <summary>
-        /// Suit representation of our card, possible values are Clubs (0), Spades (1), Diamonds (2) and Hearts (3)
+        /// Suit representation of our card, possible values are Clubs, Spades, Diamonds and Hearts
         /// </summary>
         [JsonPropertyName("suit")]
-        public byte Suit { get; }
+        public Suit Suit { get; }
         
         /// <summary>
-        /// Represents our card value, Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 
+        /// Represents our card value, LowAce = 1, Two = 2, Three = 3, Four = 4, Five = 5, Six = 6, Seven = 7, Eight = 8, Nine = 9, Ten = 10, Jack = 11, Queen = 12, King = 13, Ace = 14 
         /// </summary>
         [JsonPropertyName("value")]
-        public byte Value { get; }
+        public Value Value { get; }
         
         [JsonConstructor]
-        public Card(byte value, byte suit)
+        public Card(Value value, Suit suit)
         {
             Value = value;
             Suit = suit;
@@ -40,15 +40,33 @@ namespace PokerMonteCarloAPI
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Suit, Value);
+            return HashCode.Combine((int)Suit, (int)Value);
         }
     }
     
-    public enum Suit
+    public enum Suit : byte
     {
         Clubs,
         Spades,
         Diamonds,
         Hearts
+    }
+
+    public enum Value : byte
+    {
+        LowAce = 1,
+        Two = 2,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Ten,
+        Jack,
+        Queen,
+        King,
+        Ace = 14
     }
 }

@@ -21,24 +21,24 @@ namespace PokerMonteCarloAPI.Tests
             allCards.Count.Should().Be(52);
             allCardsSet.Count.Should().Be(52);
 
-            allCardsSet.Count(card => card.Suit == 0).Should().Be(13);
-            allCardsSet.Count(card => card.Suit == 1).Should().Be(13);
-            allCardsSet.Count(card => card.Suit == 2).Should().Be(13);
-            allCardsSet.Count(card => card.Suit == 3).Should().Be(13);
+            allCardsSet.Count(card => card.Suit == Suit.Hearts).Should().Be(13);
+            allCardsSet.Count(card => card.Suit == Suit.Diamonds).Should().Be(13);
+            allCardsSet.Count(card => card.Suit == Suit.Clubs).Should().Be(13);
+            allCardsSet.Count(card => card.Suit == Suit.Spades).Should().Be(13);
             
-            allCardsSet.Count(card => card.Value == 2).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 3).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 4).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 5).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 6).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 7).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 8).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 9).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 10).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 11).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 12).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 13).Should().Be(4);
-            allCardsSet.Count(card => card.Value == 14).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Two).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Three).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Four).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Five).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Six).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Seven).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Eight).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Nine).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Ten).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Jack).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Queen).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.King).Should().Be(4);
+            allCardsSet.Count(card => card.Value == Value.Ace).Should().Be(4);
         }
 
         [Test]

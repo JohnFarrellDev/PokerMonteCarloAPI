@@ -1,81 +1,83 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
 using FluentValidation;
+using System.Linq;
 
 #nullable enable
 namespace PokerMonteCarloAPI
 {
     public class Request
     {
-        [JsonPropertyName("players")] 
-        public List<PlayerRequest> Players { get; init; } = null!;
-        
-        [JsonPropertyName("tableCards")]
-        public List<Card> TableCards { get; set; } = null!;
+        public required List<PlayerRequest> Players { get; set; }
+        public required List<Card> TableCards { get; set; }
     }
 
     public class PlayerRequest
     {
-        [JsonPropertyName("cards")]
-        public List<Card> Cards { get; set; } = null!;
-        
-        [JsonPropertyName("folded")]
-        public bool Folded { get; set; }
+        public required List<Card> Cards { get; set; }
+        public required bool Folded { get; set; }
     }
     
     public class RequestValidator : AbstractValidator<Request>
     {
         public RequestValidator()
         {
+
+            RuleFor(r => r.Players.Count(p => !p.Folded))
+                .GreaterThanOrEqualTo(1)
+                .WithName("Active player count")
+                .WithMessage("Must provide at least one player who has not folded");
+
             RuleFor(r => r.Players.Count)
                 .GreaterThanOrEqualTo(2)
                 .LessThanOrEqualTo(14);
 
-            RuleFor(r => r.TableCards.Count).LessThanOrEqualTo(5);
-            
-            RuleForEach(r => r.Players)
-                .Must(player => player.Cards.Count <= 2)
-                .WithMessage("can only provide at most 2 cards for any player");
+            RuleFor(r => r.Players)
+                .NotNull().WithMessage("Players list cannot be null")
+                .NotEmpty().WithMessage("Players list cannot be empty");
 
-            RuleFor(r => r.Players.Count(p => !p.Folded))
-                .GreaterThanOrEqualTo(1)
-                .WithName("Player folded count")
-                .WithMessage("Must provide at least one player who has not folded");
+            RuleFor(r => r.TableCards)
+                .NotNull().WithMessage("Table cards list cannot be null");
 
-            RuleFor(r => r.Players).Must((request, _) =>
-                {
-                    foreach (var card in request.Players.SelectMany(player => player.Cards))
-                    {
-                        if ((int)card.Value < 2 || (int)card.Value > 14) return false;
-                        if ((int)card.Suit < 0 || (int)card.Suit > 3) return false;
-                    }
-                    foreach (var card in request.TableCards)
-                    {
-                        if ((int)card.Value < 2 || (int)card.Value > 14) return false;
-                        if ((int)card.Suit < 0 || (int)card.Suit > 3) return false;
-                    }
-                    return true;
-                })
-                .WithMessage(
-                    "card value must be between 2 and 14 (inclusive), card suit must be between 0 and 3 (inclusive)");
-            
-            RuleFor(r => r).Must((request, _) =>
-                {
-                    var providedCardCount = request.TableCards.Count +
-                                            request.Players.Sum(requestOpponentsHand =>
-                                                requestOpponentsHand.Cards.Count);
-            
-                    var uniqueProvidedCards = new HashSet<Card>();
-                    uniqueProvidedCards.UnionWith(request.TableCards);
-                    foreach (var player in request.Players)
-                    {
-                        uniqueProvidedCards.UnionWith(player.Cards);
-                    }
-            
-                    return uniqueProvidedCards.Count == providedCardCount;
-                })
-                .WithMessage("provided cards (player and table cards) must all be unique");
+            When(r => r.Players != null, () =>
+            {
+                RuleForEach(r => r.Players).SetValidator(new PlayerRequestValidator());
+            });
+
+            When(r => r.TableCards != null, () =>
+            {
+                RuleForEach(r => r.TableCards).SetValidator(new CardValidator());
+            });
+
+            RuleFor(r => r)
+                .Must(r => !r.Players.Any(p => p.Cards.Any(c => r.TableCards.Contains(c))))
+                .WithMessage("Player cards must not be present in the table cards");
+        }
+    }
+
+    public class PlayerRequestValidator : AbstractValidator<PlayerRequest>
+    {
+        public PlayerRequestValidator()
+        {
+            RuleFor(p => p.Cards)
+                .NotNull().WithMessage("Player cards cannot be null")
+                .Must(cards => cards != null && cards.Count == 2)
+                .WithMessage("Each player must have exactly 2 cards");
+
+            RuleFor(p => p.Cards)
+                .ForEach(card => card.SetValidator(new CardValidator()));
+        }
+    }
+
+    public class CardValidator : AbstractValidator<Card>
+    {
+        public CardValidator()
+        {
+            RuleFor(c => c.Suit)
+                .IsInEnum().WithMessage(c => $"Invalid card suit: {c.Suit}. Allowed suits are: {string.Join(", ", Enum.GetValues(typeof(Suit)))}");
+
+            RuleFor(c => c.Value)
+                .IsInEnum().WithMessage(c => $"Invalid card value: {c.Value}. Allowed values are: {string.Join(", ", Enum.GetValues(typeof(Value)))}");
         }
     }
 }
