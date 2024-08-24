@@ -31,11 +31,11 @@ namespace PokerMonteCarloAPI.Tests
             validationResults.IsValid.Should().BeTrue();
         }
 
-        private static IEnumerable<(int players, string errorMessage)> InvalidPlayerCounts => new[]
+        private static IEnumerable<object[]> InvalidPlayerCounts => new[]
         {
-            (0, "Must provide at least one player who has not folded\n'Players Count' must be greater than or equal to '2'.\nPlayers list cannot be empty"),
-            (1, "'Players Count' must be greater than or equal to '2'."),
-            (15, "'Players Count' must be less than or equal to '14'.")
+            new object[] { 0, "Must provide at least one player who has not folded\r\n'Players Count' must be greater than or equal to '2'.\r\nPlayers list cannot be empty" },
+            new object[] { 1, "'Players Count' must be greater than or equal to '2'." },
+            new object[] { 15, "'Players Count' must be less than or equal to '14'." }
         };
         [TestCaseSource(nameof(InvalidPlayerCounts))]
         public void ValidationFailsWhenLessThan2PlayersOrMoreThan14(int numberOfPlayers, string errorMessage)
@@ -83,7 +83,7 @@ namespace PokerMonteCarloAPI.Tests
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
+            validationResults.ToString().Should().Be("Players cannot share cards");
         }
         
         [Test]
@@ -91,8 +91,8 @@ namespace PokerMonteCarloAPI.Tests
         {
             var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
             var sharedCard = _allCards.Pop();
-            players[0].Cards = new List<Card> { sharedCard };
-            players[1].Cards = new List<Card> { sharedCard };
+            players[0].Cards = new List<Card> { sharedCard, _allCards.Pop() };
+            players[1].Cards = new List<Card> { sharedCard, _allCards.Pop() };
 
             var request = new Request
             {
@@ -103,7 +103,7 @@ namespace PokerMonteCarloAPI.Tests
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be("provided cards (player and table cards) must all be unique");
+            validationResults.ToString().Should().Be("Players cannot share cards");
         }
         
         [Test]
@@ -130,7 +130,7 @@ namespace PokerMonteCarloAPI.Tests
         public void ValidationFailsWhenCardValueIsNotValidForAnyPlayerCards()
         {
             var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
-            players[0].Cards = new List<Card> { new Card((Value)0, Suit.Diamonds) };
+            players[0].Cards = new List<Card> { new(0, Suit.Diamonds), _allCards.Pop() };
 
             var request = new Request
             {
@@ -141,14 +141,14 @@ namespace PokerMonteCarloAPI.Tests
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be("Invalid card value: 0. Allowed values are: LowAce, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace");
+            validationResults.ToString().Should().Be("Invalid card value: 0. Allowed values are: 1 (LowAce), 2 (Two), 3 (Three), 4 (Four), 5 (Five), 6 (Six), 7 (Seven), 8 (Eight), 9 (Nine), 10 (Ten), 11 (Jack), 12 (Queen), 13 (King), 14 (Ace)");
         }
 
         [Test]
         public void ValidationFailsWhenCardSuitIsNotValidForAnyPlayerCards()
         {
             var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
-            players[0].Cards = new List<Card> { new Card(Value.Ace, (Suit)4) };
+            players[0].Cards = new List<Card> { new(Value.Ace, 0), _allCards.Pop() };
 
             var request = new Request
             {
@@ -159,7 +159,7 @@ namespace PokerMonteCarloAPI.Tests
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be("Invalid card suit: 4. Allowed suits are: Clubs, Spades, Diamonds, Hearts");
+            validationResults.ToString().Should().Be("Invalid card suit: 0. Allowed suits are: 1 (Clubs), 2 (Spades), 3 (Diamonds), 4 (Hearts)");
         }
 
         [Test]
@@ -187,14 +187,14 @@ namespace PokerMonteCarloAPI.Tests
         {
             var request = new Request
             {
-                TableCards = new List<Card> { new Card((Value)15, Suit.Hearts) },
+                TableCards = new List<Card> { new(0, Suit.Hearts) },
                 Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
             };
             
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be($"Invalid card value: 15. Allowed values are: LowAce, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace");
+            validationResults.ToString().Should().Be("Invalid card value: 0. Allowed values are: 1 (LowAce), 2 (Two), 3 (Three), 4 (Four), 5 (Five), 6 (Six), 7 (Seven), 8 (Eight), 9 (Nine), 10 (Ten), 11 (Jack), 12 (Queen), 13 (King), 14 (Ace)");
         }
 
         [Test]
@@ -202,14 +202,14 @@ namespace PokerMonteCarloAPI.Tests
         {
             var request = new Request
             {
-                TableCards = new List<Card> { new Card(Value.Ace, (Suit)4) },
+                TableCards = new List<Card> { new (Value.Ace, 0) },
                 Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
             };
 
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeFalse();
-            validationResults.ToString().Should().Be("Invalid card suit: 4. Allowed suits are: Clubs, Spades, Diamonds, Hearts");
+            validationResults.ToString().Should().Be("Invalid card suit: 0. Allowed suits are: 1 (Clubs), 2 (Spades), 3 (Diamonds), 4 (Hearts)");
         }
 
         [Test]
