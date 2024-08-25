@@ -36,7 +36,7 @@ namespace PokerMonteCarloAPI.Tests
 
         private static IEnumerable<object[]> InvalidPlayerCounts => new[]
         {
-            new object[] { 0, "Must provide at least one player who has not folded\r\n'Players Count' must be greater than or equal to '2'.\r\nPlayers list cannot be empty" },
+            new object[] { 0, $"Must provide at least one player who has not folded{Environment.NewLine}'Players Count' must be greater than or equal to '2'.{Environment.NewLine}Players list cannot be empty" },
             new object[] { 1, "'Players Count' must be greater than or equal to '2'." },
             new object[] { 15, "'Players Count' must be less than or equal to '14'." }
         };
