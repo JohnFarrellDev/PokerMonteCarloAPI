@@ -1,8 +1,6 @@
 # PokerMonteCarloAPI
 
-Build: [![Build](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg?branch=master&job=build)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
-
-Test: [![Test](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg?branch=master&job=test)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
+[![CI](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
 
 PokerMonteCarloAPI is a .NET-based API that uses Monte Carlo simulation to calculate poker hand probabilities.
 
