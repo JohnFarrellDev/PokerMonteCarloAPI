@@ -1,6 +1,8 @@
 # PokerMonteCarloAPI
 
-[![CI](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
+Build: [![Build](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg?branch=master&job=build)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
+
+Test: [![Test](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml/badge.svg?branch=master&job=test)](https://github.com/JohnFarrellDev/PokerMonteCarloAPI/actions/workflows/ci.yml)
 
 PokerMonteCarloAPI is a .NET-based API that uses Monte Carlo simulation to calculate poker hand probabilities.
 
@@ -46,6 +48,15 @@ PokerMonteCarloAPI is a .NET-based API that uses Monte Carlo simulation to calcu
    ```
 
    The API will be available at `http://localhost:5000`.
+
+### CI/CD
+
+This project uses GitHub Actions for Continuous Integration and Continuous Deployment. The workflow includes:
+
+1. Build stage: Compiles the project and checks for build errors.
+2. Test stage: Runs all unit tests to ensure code quality and functionality.
+
+You can view the CI workflow status in the Actions tab of the GitHub repository.
 
 ### Docker Deployment
 
