@@ -49,12 +49,14 @@ PokerMonteCarloAPI is a .NET-based API that uses Monte Carlo simulation to calcu
 
 ### CI/CD
 
-This project uses GitHub Actions for Continuous Integration and Continuous Deployment. The workflow includes:
+This project uses GitHub Actions for Continuous Integration. The workflow includes:
 
-1. Build stage: Compiles the project and checks for build errors.
-2. Test stage: Runs all unit tests to ensure code quality and functionality.
+1. Setup: Configures the .NET environment (version 7.0.x).
+2. Restore dependencies: Installs all required packages.
+3. Build stage: Compiles the project and checks for build errors.
+4. Test stage: Runs all unit tests to ensure code quality and functionality.
 
-You can view the CI workflow status in the Actions tab of the GitHub repository.
+You can view the CI workflow status by clicking on the CI badge at the top of this README.
 
 ### Docker Deployment
 
