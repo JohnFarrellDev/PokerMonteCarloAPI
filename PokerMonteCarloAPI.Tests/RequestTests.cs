@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
+using Moq;
+using PokerMonteCarloAPI.Services;
 
 #nullable enable
 namespace PokerMonteCarloAPI.Tests
@@ -11,21 +13,22 @@ namespace PokerMonteCarloAPI.Tests
     public class RequestTests
     {
         private readonly RequestValidator _validator = new();
-        private readonly Random _random = new();
+        private Mock<IRandomService> _mockRandomService = null!;
         private List<Card> _allCards = null!;
         
         [SetUp]
         public void Setup()
         {
-            _allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            _mockRandomService = new Mock<IRandomService>();
+            _allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
         }
         
         [Test]
         [Repeat(1000)]
         public void ValidationPassedWithValidProperties()
         {
-            var request = TestUtilities.GenerateRequest(_allCards, _random);
-            
+            var request = TestUtilities.GenerateRequest(_allCards, _mockRandomService.Object);
+
             var validationResults = _validator.Validate(request);
 
             validationResults.IsValid.Should().BeTrue();
@@ -40,7 +43,7 @@ namespace PokerMonteCarloAPI.Tests
         [TestCaseSource(nameof(InvalidPlayerCounts))]
         public void ValidationFailsWhenLessThan2PlayersOrMoreThan14(int numberOfPlayers, string errorMessage)
         {
-            var request = TestUtilities.GenerateRequest(_allCards, _random, numberOfPlayers);
+            var request = TestUtilities.GenerateRequest(_allCards, _mockRandomService.Object, numberOfPlayers);
             
             var validationResults = _validator.Validate(request);
 
@@ -51,12 +54,12 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenPlayerSubmittedWithMoreThan2Cards()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             players[0].Cards.Add(_allCards.Pop());
             
             var request = new Request
             {
-                TableCards = TestUtilities.GenerateTableCards(_allCards, _random).ToList(),
+                TableCards = TestUtilities.GenerateTableCards(_allCards, _mockRandomService.Object).ToList(),
                 Players = players
             };
             
@@ -70,13 +73,13 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenAPlayerHasDuplicateCards()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             var sharedCard = _allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard, sharedCard };
 
             var request = new Request
             {
-                TableCards = TestUtilities.GenerateTableCards(_allCards, _random).ToList(),
+                TableCards = TestUtilities.GenerateTableCards(_allCards, _mockRandomService.Object).ToList(),
                 Players = players
             };
             
@@ -89,14 +92,14 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenDifferentPlayersShareACard()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             var sharedCard = _allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard, _allCards.Pop() };
             players[1].Cards = new List<Card> { sharedCard, _allCards.Pop() };
 
             var request = new Request
             {
-                TableCards = TestUtilities.GenerateTableCards(_allCards, _random).ToList(),
+                TableCards = TestUtilities.GenerateTableCards(_allCards, _mockRandomService.Object).ToList(),
                 Players = players
             };
             
@@ -109,7 +112,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenAPlayersSharesACardWithTheTable()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             var sharedCard = _allCards.Pop();
             players[0].Cards = new List<Card> { sharedCard, _allCards.Pop() };
             var tableCards = new List<Card> { sharedCard };
@@ -129,12 +132,12 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenCardValueIsNotValidForAnyPlayerCards()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             players[0].Cards = new List<Card> { new(0, Suit.Diamonds), _allCards.Pop() };
 
             var request = new Request
             {
-                TableCards = TestUtilities.GenerateTableCards(_allCards, _random).ToList(),
+                TableCards = TestUtilities.GenerateTableCards(_allCards, _mockRandomService.Object).ToList(),
                 Players = players
             };
             
@@ -147,12 +150,12 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void ValidationFailsWhenCardSuitIsNotValidForAnyPlayerCards()
         {
-            var players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList();
+            var players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList();
             players[0].Cards = new List<Card> { new(Value.Ace, 0), _allCards.Pop() };
 
             var request = new Request
             {
-                TableCards = TestUtilities.GenerateTableCards(_allCards, _random).ToList(),
+                TableCards = TestUtilities.GenerateTableCards(_allCards, _mockRandomService.Object).ToList(),
                 Players = players
             };
 
@@ -173,7 +176,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = tableCards,
-                Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
+                Players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -188,7 +191,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = new List<Card> { new(0, Suit.Hearts) },
-                Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
+                Players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList()
             };
             
             var validationResults = _validator.Validate(request);
@@ -203,7 +206,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = new List<Card> { new (Value.Ace, 0) },
-                Players = TestUtilities.GenerateTestPlayers(_allCards, _random).ToList()
+                Players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object).ToList()
             };
 
             var validationResults = _validator.Validate(request);
@@ -218,7 +221,7 @@ namespace PokerMonteCarloAPI.Tests
             var request = new Request
             {
                 TableCards = new List<Card>(),
-                Players = TestUtilities.GenerateTestPlayers(_allCards, _random, 5, 5).ToList()
+                Players = TestUtilities.GenerateTestPlayers(_allCards, _mockRandomService.Object, 5, 5).ToList()
             };
             
             var validationResults = _validator.Validate(request);

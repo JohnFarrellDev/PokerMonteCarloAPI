@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PokerMonteCarloAPI.Services;
 
 namespace PokerMonteCarloAPI
 {
     public class Monte : IMonte
     {
+        private readonly IRandomService _randomService;
+
+        public Monte(IRandomService randomService)
+        {
+            _randomService = randomService;
+        }
+
         public List<PlayerResult> Carlo(Request request)
         {
 
@@ -32,7 +40,7 @@ namespace PokerMonteCarloAPI
                 {
                     for (var j = 0; j < simulationsPerThread; j++)
                     {
-                        var shuffledRemainingCards = remainingCards.ToList().FisherYatesShuffle();
+                        var shuffledRemainingCards = remainingCards.ToList().FisherYatesShuffle(_randomService);
                         var tableCards = Utilities.GenerateTableCards(request, shuffledRemainingCards);
                         var players = Utilities.GeneratePlayers(tableCards, shuffledRemainingCards, request);
                         var playersBestHands = players.Select(player => player.CalculateBestHand()).ToList();

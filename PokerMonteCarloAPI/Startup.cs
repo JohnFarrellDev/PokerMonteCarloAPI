@@ -1,8 +1,8 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using PokerMonteCarloAPI.Services;
 
 namespace PokerMonteCarloAPI
 {
@@ -14,11 +14,11 @@ namespace PokerMonteCarloAPI
         {
             services
                 .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation(fv =>
                     fv.RegisterValidatorsFromAssemblyContaining<Startup>(lifetime: ServiceLifetime.Singleton));
 
             services.AddScoped<IMonte, Monte>();
+            services.AddSingleton<IRandomService, RandomService>();
 
             services.AddSwaggerDocument(configure => configure.Title = "Poker Monte Carlo API");
             services.AddSwaggerGen();

@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
+using PokerMonteCarloAPI.Services;
 
 namespace PokerMonteCarloAPI.Tests
 {
@@ -14,20 +15,21 @@ namespace PokerMonteCarloAPI.Tests
         private Controller _controller = null!;
         private Mock<IMonte> _mockMonte = null!;
         private List<Card> allCards = null!;
-        private readonly Random Random = new Random();
+        private Mock<IRandomService> mockRandomService = null!;
         
         [SetUp]
         public void Setup()
         {
             _mockMonte = new Mock<IMonte>();
             _controller = new Controller(_mockMonte.Object);
-            allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            mockRandomService = new Mock<IRandomService>();
+            allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(mockRandomService.Object);
         }
 
         [Test]
         public void WhenMonteReturnsAResponseTheControllerReturnsTheResponseObjectWithA200()
         {
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, mockRandomService.Object);
             var expectedResponse = TestUtilities.GenerateListPlayerResult(request.Players.Count);
             _mockMonte.Setup(x => x.Carlo(request)).Returns(expectedResponse);
 
@@ -40,7 +42,7 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void WhenMonteCarloIsCalledTheMonteServiceIsCalledWithTheSameRequestObject()
         {
-            var request = TestUtilities.GenerateRequest(allCards, Random);
+            var request = TestUtilities.GenerateRequest(allCards, mockRandomService.Object);
             _mockMonte.Setup(x => x.Carlo(request));
 
             _controller.MonteCarlo(request);

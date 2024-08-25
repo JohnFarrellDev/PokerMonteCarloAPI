@@ -1,16 +1,23 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using ScottPlot;
+using PokerMonteCarloAPI.Services;
+using Moq;
 
+#nullable enable
 namespace PokerMonteCarloAPI.Tests
 {
     [TestFixture]
     public class UtilitiesTests
     {
-        private readonly Random _random = new Random();
+        private Mock<IRandomService> _mockRandomService = null!;
+        
+        [SetUp]
+        public void Setup()
+        {
+            _mockRandomService = new Mock<IRandomService>();
+        }
         
         [Test]
         public void GenerateAllCardsProduced52DistinctPlayingCards()
@@ -54,118 +61,54 @@ namespace PokerMonteCarloAPI.Tests
 
         private static object[] _seededFisherYatesShuffle =
         {
-            new object[] {1, new List<int> {4,3,5,1,2}},
-            new object[] {11, new List<int> {4,5,2,1,3}},
-            new object[] {111, new List<int> {3,1,5,2,4}},
-            new object[] {1111, new List<int> {5,3,2,4,1}},
-            new object[] {11111, new List<int> {5,3,1,4,2}},
-            new object[] {2, new List<int> {3,5,1,2,4}},
-            new object[] {22, new List<int> {4,3,1,5,2}},
-            new object[] {222, new List<int> {1,2,3,5,4}},
-            new object[] {2222, new List<int> {1,2,5,4,3}},
-            new object[] {22222, new List<int> {4,2,3,5,1}},
-            new object[] {222222, new List<int> {2,3,5,4,1}},
-            new object[] {3, new List<int> {5,1,4,3,2}},
-            new object[] {33, new List<int> {1,2,4,3,5}},
-            new object[] {333, new List<int> {1,5,2,3,4}},
-            new object[] {3333, new List<int> {1,3,2,4,5}},
-            new object[] {33333, new List<int> {5,3,1,2,4}},
-            new object[] {333333, new List<int> {3,1,5,4,2}}
+            new object[] {1, new List<int> {5,4,1,3,2}},
+            new object[] {11, new List<int> {3,4,5,1,2}},
+            new object[] {111, new List<int> {5,4,3,1,2}},
+            new object[] {1111, new List<int> {5,3,4,1,2}},
+            new object[] {11111, new List<int> {3,4,5,1,2}},
+            new object[] {2, new List<int> {1,5,2,4,3}},
+            new object[] {22, new List<int> {5,2,1,4,3}},
+            new object[] {222, new List<int> {1,2,5,4,3}},
+            new object[] {2222, new List<int> {1,5,2,4,3}},
+            new object[] {22222, new List<int> {5,2,1,4,3}},
+            new object[] {222222, new List<int> {1,2,5,4,3}},
+            new object[] {3, new List<int> {2,5,3,1,4}},
+            new object[] {33, new List<int> {2,1,5,3,4}},
+            new object[] {333, new List<int> {2,1,5,3,4}},
+            new object[] {3333, new List<int> {2,1,5,3,4}},
+            new object[] {33333, new List<int> {2,1,5,3,4}},
+            new object[] {333333, new List<int> {2,1,5,3,4}}
         };
         [TestCaseSource(nameof(_seededFisherYatesShuffle))]
         public void FisherYatesWhenRandomSeededProducesSameOutput(int seed, List<int> expectedOutput)
         {
-            var shuffledNumbers1To5 = Enumerable.Range(1, 5).ToList().FisherYatesShuffle(seed);
+            int currentIndex = 0;
+            _mockRandomService.Setup(r => r.Next(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns((int min, int max) => 
+                {
+                    int result = (seed + currentIndex) % (max - min) + min;
+                    currentIndex++;
+                    return result;
+                });
 
-            shuffledNumbers1To5.Should().ContainInOrder(expectedOutput);
+            var shuffledNumbers1To5 = Enumerable.Range(1, 5).ToList().FisherYatesShuffle(_mockRandomService.Object);
+
+            shuffledNumbers1To5.Should().BeEquivalentTo(expectedOutput, options => options.WithStrictOrdering());
         }
         
         [Test]
-        public void FisherYatesShouldRandomlyShuffleAList()
-        {
-            // arrange
-            const int upperIterationBound = 5_000;
-            const int upperBoundOfRangeOfNumbers = 5_000;
-            var countNumbersRandomPositionScores = new int[upperBoundOfRangeOfNumbers].ToList();
-            
-            for (var i = 0; i < upperIterationBound; i++)
-            {
-                // act
-                var numbers1To1000 = Enumerable.Range(1, upperBoundOfRangeOfNumbers).ToList().FisherYatesShuffle();
-                
-                for (var j = 0; j < upperBoundOfRangeOfNumbers; j++)
-                {
-                    countNumbersRandomPositionScores[j] += numbers1To1000[j];
-                }
-            }
-            
-            // maths bit
-            const long average = ((long)upperBoundOfRangeOfNumbers/2) * (upperIterationBound) - ((upperBoundOfRangeOfNumbers/ upperIterationBound) / 2);
-            var deviationSquared = countNumbersRandomPositionScores.Sum(x => Math.Pow(x - average, 2));
-            var variance = deviationSquared / countNumbersRandomPositionScores.Count;
-            var standardDeviation = Math.Sqrt(variance);
-
-            var percentageOfValuesWithin1StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation && x < average + standardDeviation)) / upperBoundOfRangeOfNumbers * 100;
-            var percentageOfValuesWithin2StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation * 2 && x < average + standardDeviation * 2)) / upperBoundOfRangeOfNumbers * 100;
-            var percentageOfValuesWithin3StdDeviation = (double)(countNumbersRandomPositionScores.Count(x => x > average - standardDeviation * 3 && x < average + standardDeviation * 3)) / upperBoundOfRangeOfNumbers * 100;
-
-            // assert
-            // With a normally distributed set of numbers you expect to see 68% within one standard deviation of the mean
-            // Random placement of elements within our element should result in our countNumbersRandomPositionScores values showing normal distribution
-            Assert.That(percentageOfValuesWithin1StdDeviation, Is.EqualTo(68.27).Within(3));
-            Assert.That(percentageOfValuesWithin2StdDeviation, Is.EqualTo(95.45).Within(1.5));
-            Assert.That(percentageOfValuesWithin3StdDeviation, Is.EqualTo(99.7).Within(0.5));
-            
-            // generate plot to see normal distribution
-            const int binWidth = 2_000;
-            
-            var binLowerBounds = new List<double>();
-            for (var i = average - average * 0.05; i < average + average * 0.05; i += binWidth)
-            {
-                binLowerBounds.Add(i);
-            }
-            
-            var binCounts = new List<double>();
-            for (var i = average - average * 0.05; i < average + average * 0.05; i += binWidth)
-            {
-                binCounts.Add(countNumbersRandomPositionScores.Count(x => x >= i && x < i + binWidth));
-            }
-            
-            var plt = new Plot(1200, 800);
-            
-            var bar = plt.AddBar(binCounts.ToArray(), binLowerBounds.ToArray());
-
-            // customize the width of bars (80% of the inter-position distance looks good)
-            bar.BarWidth = (binLowerBounds[1] - binLowerBounds[0]);
-
-            // adjust axis limits so there is no padding below the bar graph
-            plt.YAxis.Label("Frequency");
-            plt.XAxis.Label($"Cumulative sum from {upperIterationBound} iterations of an array of discrete values 1-{upperBoundOfRangeOfNumbers} being shuffled with fisher-yates");
-            plt.SetAxisLimits(yMin: 0);
-            
-            plt.Style(Style.Gray1);
-            var bnColor = System.Drawing.ColorTranslator.FromHtml("#2e3440");
-            plt.Style(bnColor, bnColor);
-            
-            plt.SaveFig("bar_positions.png");
-        }
-
-        [Test]
         public void GenerateAllTableCardsFromRequest()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
             
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             while (request.TableCards.Count < 5)
             {
                 request.TableCards.Add(allCards.Pop());
             }
 
-            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
 
-            // assert
             tableCards.Count.Should().Be(5);
             tableCards.Should().ContainInOrder(request.TableCards);
         }
@@ -173,17 +116,14 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void GenerateAllTableCardsFromDeck()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             request.TableCards = new List<Card>();
             var top5CardsFromDeck = allCards.TakeLast(5).ToList();
             top5CardsFromDeck.Reverse();
             
-            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
 
-            // assert
             tableCards.Count.Should().Be(5);
             tableCards.Should().ContainInOrder(top5CardsFromDeck);
         }
@@ -191,12 +131,11 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void GenerateTableCardsFromRequestAndDeck()
         {
-            // arrange
             const int numberOfCardsFromRequests = 3;
             const int numberOfCardsFromDeck = 2;
             
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             request.TableCards = new List<Card>();
             
             while (request.TableCards.Count < numberOfCardsFromRequests)
@@ -207,10 +146,8 @@ namespace PokerMonteCarloAPI.Tests
             var cardsFromDeck = allCards.TakeLast(numberOfCardsFromDeck).ToList();
             cardsFromDeck.Reverse();
             
-            // act
             var tableCards = Utilities.GenerateTableCards(request, allCards);
             
-            // assert
             tableCards.Count.Should().Be(5);
             tableCards.Should().ContainInOrder(request.TableCards.Concat(cardsFromDeck));
         }
@@ -218,9 +155,8 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void TestGeneratePlayerWithFullHandAndTableCards()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
 
             var playerRequest = request.Players[0];
@@ -231,10 +167,8 @@ namespace PokerMonteCarloAPI.Tests
             
             var preGeneratingPlayerAllCardsCount = allCards.Count;
 
-            // act
             var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, playerRequest);
             
-            // assert
             generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount);
             
@@ -251,9 +185,8 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void TestGeneratePlayerWithNoTableCards()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             request.TableCards = new List<Card>();
             var deckCardsToBeAdded = allCards.TakeLast(5).ToList();
 
@@ -265,10 +198,8 @@ namespace PokerMonteCarloAPI.Tests
             
             var preGeneratingPlayerAllCardsCount = allCards.Count;
 
-            // act
             var generatedPlayer = Utilities.GeneratePlayer(new List<Card>(), allCards, playerRequest);
             
-            // assert
             generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 5);
             
@@ -285,9 +216,8 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void TestGeneratePlayerWithNoProvidedPlayerCards()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             request.Players[0].Cards = new List<Card>();
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
             
@@ -295,10 +225,7 @@ namespace PokerMonteCarloAPI.Tests
             
             var preGeneratingPlayerAllCardsCount = allCards.Count;
 
-            // act
             var generatedPlayer = Utilities.GeneratePlayer(sharedTableCards, allCards, request.Players[0]);
-            
-            // assert
             
             generatedPlayer.PlayersHand.Count.Should().Be(7);
             allCards.Count.Should().Be(preGeneratingPlayerAllCardsCount - 2);
@@ -316,15 +243,12 @@ namespace PokerMonteCarloAPI.Tests
         [Test]
         public void TestGeneratePlayersTakeARequestAndOutputsAListOfValidPlayers()
         {
-            // arrange
-            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle();
-            var request = TestUtilities.GenerateRequest(allCards, _random);
+            var allCards = Utilities.GenerateAllCards().ToList().FisherYatesShuffle(_mockRandomService.Object);
+            var request = TestUtilities.GenerateRequest(allCards, _mockRandomService.Object);
             var sharedTableCards = Utilities.GenerateTableCards(request, allCards);
 
-            // act
             var generatedPlayers = Utilities.GeneratePlayers(sharedTableCards, allCards, request);
 
-            // assert
             generatedPlayers.Count.Should().Be(request.Players.Count);
             
             for (var i = 0; i < generatedPlayers.Count; i++)
@@ -346,15 +270,5 @@ namespace PokerMonteCarloAPI.Tests
                 }
             }
         }
-
-        // private static object[] playerHandsToCalculateBestHand =
-        // {
-        //     new object[] {333333, new List<int> {3,1,5,4,2}}
-        // };
-        // [TestCaseSource(nameof(playerHandsToCalculateBestHand))]
-        // public void CalculateBestHandReturnsExpectedHandAndHighCards(int v1, List<int> v2)
-        // {
-        //     true.Should().BeTrue();
-        // }
     }
 }

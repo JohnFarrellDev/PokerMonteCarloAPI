@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokerMonteCarloAPI.Services;
 
 #nullable enable
 namespace PokerMonteCarloAPI
@@ -52,15 +53,13 @@ namespace PokerMonteCarloAPI
             }
         }
         
-        public static List<T> FisherYatesShuffle<T>(this List<T> listToShuffle, int? seed = null)
+        public static List<T> FisherYatesShuffle<T>(this List<T> listToShuffle, IRandomService randomService)
         {
             var n = listToShuffle.Count;
-
-            var rng = seed == null ? new Random() : new Random(seed.Value);
             
             while (n > 1)
             {
-                var k = rng.Next(0, n--);
+                var k = randomService.Next(0, n--);
                 (listToShuffle[n], listToShuffle[k]) = (listToShuffle[k], listToShuffle[n]);
             }
 

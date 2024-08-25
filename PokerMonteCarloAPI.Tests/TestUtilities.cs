@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PokerMonteCarloAPI.Services;
 
 #nullable enable
 namespace PokerMonteCarloAPI.Tests
 {
     public static class TestUtilities
     {
-        public static Request GenerateRequest(List<Card> allCards, Random random, int? numberOfPlayers = null)
+        public static Request GenerateRequest(List<Card> allCards, IRandomService randomService, int? numberOfPlayers = null)
         {
             return new Request
             {
-                TableCards = GenerateTableCards(allCards, random).ToList(),
-                Players = GenerateTestPlayers(allCards, random, numberOfPlayers).ToList()
+                TableCards = GenerateTableCards(allCards, randomService).ToList(),
+                Players = GenerateTestPlayers(allCards, randomService, numberOfPlayers).ToList()
             };
         }
 
@@ -40,17 +41,17 @@ namespace PokerMonteCarloAPI.Tests
         }
 
 
-        public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, Random random)
+        public static IEnumerable<Card> GenerateTableCards(List<Card> allCards, IRandomService randomService)
         {
-            for(var i = 0; i < random.Next(6); i++)
+            for(var i = 0; i < randomService.Next(6); i++)
             {
                 yield return allCards.Pop();
             }
         }
 
-        public static IEnumerable<PlayerRequest> GenerateTestPlayers(List<Card> allCards, Random random, int? numberOfPlayers = null, int numberOfPlayersFolded = 0)
+        public static IEnumerable<PlayerRequest> GenerateTestPlayers(List<Card> allCards, IRandomService randomService, int? numberOfPlayers = null, int numberOfPlayersFolded = 0)
         {
-            numberOfPlayers ??= random.Next(13) + 2;
+            numberOfPlayers ??= randomService.Next(13) + 2;
 
             
             for (var i = 0; i < numberOfPlayers; i++)
