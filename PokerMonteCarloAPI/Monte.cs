@@ -9,6 +9,7 @@ namespace PokerMonteCarloAPI
     public class Monte : IMonte
     {
         private readonly IRandomService _randomService;
+        private readonly int _numberOfSimulations = 100_000;
 
         public Monte(IRandomService randomService)
         {
@@ -18,7 +19,7 @@ namespace PokerMonteCarloAPI
         public List<PlayerResult> Carlo(Request request)
         {
 
-            const int numberOfSimulations = 100_000;
+            
             var allCards = Utilities.GenerateAllCards().ToList();
             var remainingCards = RemovePlayerAndTableCards(allCards, request);
 
@@ -31,7 +32,7 @@ namespace PokerMonteCarloAPI
             }
             
             var numberOfTasks = Environment.ProcessorCount;
-            var simulationsPerThread = numberOfSimulations / numberOfTasks;
+            var simulationsPerThread = _numberOfSimulations / numberOfTasks;
             
             var tasks = new Task[numberOfTasks];
             for (var i = 0; i < numberOfTasks; i++)
